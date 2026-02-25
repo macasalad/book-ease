@@ -1,4 +1,4 @@
-import { auth } from "../../../auth";
+import { auth } from "@/../auth";
 import { prisma} from "@/lib/prisma"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation";
@@ -11,7 +11,7 @@ export default async function Profile() {
         headers: await headers(),
     })
     
-    if (!session?.user?.email) {
+    if (!session) {
         redirect("/sign-in/");
     }
 
