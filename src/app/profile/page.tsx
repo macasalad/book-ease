@@ -1,10 +1,9 @@
-import { auth } from "@/../auth";
+import { auth } from "@/auth";
 import { prisma} from "@/lib/prisma"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { isErrored } from "stream";
 
 export default async function Profile() {
     const session = await auth.api.getSession({
@@ -21,6 +20,8 @@ export default async function Profile() {
 
     if (!user) return null;
 
+    // If user has not uploaded a custom image, their 
+    // default Google account profile picture is used instead
     const displayImage = user.customImage || user.image;
 
     return (

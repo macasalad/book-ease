@@ -1,4 +1,4 @@
-import { auth } from "@/../auth";
+import { auth } from "@/auth";
 import { headers } from "next/headers"
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
