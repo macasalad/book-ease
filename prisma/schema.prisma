@@ -78,3 +78,16 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
+model BookListing {
+  id          String   @id @default(cuid())
+  title       String
+  author      String
+  category    String
+  condition   String
+  isbn        String
+  description String?
+  photos      String[] @db.VarChar(500)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
