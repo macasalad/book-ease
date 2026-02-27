@@ -19,12 +19,14 @@ model User {
   name          String
   email         String
   emailVerified Boolean   @default(false)
-  image         String?
+  image         String?     // default image from Google account
+  customImage   String?     // User-uploaded image
+  bio           String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
-
+  
   @@unique([email])
   @@map("user")
 }
