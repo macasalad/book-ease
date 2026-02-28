@@ -26,6 +26,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  bookListings  BookListing[]
   
   @@unique([email])
   @@map("user")
@@ -88,6 +89,10 @@ model BookListing {
   isbn        String
   description String?
   photos      String[] @db.VarChar(500)
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
