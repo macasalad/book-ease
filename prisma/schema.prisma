@@ -22,11 +22,19 @@ model User {
   image         String?     // default image from Google account
   customImage   String?     // User-uploaded image
   bio           String?
+
+  // Relationships
+  lentBooks     Book[]    @relation("LentBooks")
+  borrowedBooks Book[]    @relation("BorrowedBooks")
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
   bookListings  BookListing[]
+  
+  lentBooks     Book[]    @relation("LentBooks")
+  borrowedBooks Book[]    @relation("BorrowedBooks")
   
   @@unique([email])
   @@map("user")
@@ -95,4 +103,18 @@ model BookListing {
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+model Book {
+  id          String   @id @default(cuid())
+  title       String
+  author      String
+  status      String   @default("available") // e.g., available, borrowed
+  
+  // The person who owns the book
+  lenderId    String
+  lender      User     @relation("LentBooks", fields: [lenderId], references: [id])
+
+  // The person currently borrowing it (optional)
+  borrowerId  String?
+  borrower    User?    @relation("BorrowedBooks", fields: [borrowerId], references: [id])
 }
