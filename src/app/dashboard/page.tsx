@@ -26,7 +26,7 @@ return (
             <nav className="bg-[#e0e0e0] w-full">
                 <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between text-[15px] font-medium text-gray-700">
                     <div className="flex space-x-10">
-                        <Link href="/" className="hover:text-black">Home</Link>
+                        <Link href="/dashboard" className="hover:text-black">Home</Link>
                         <Link href="/listing" className="hover:text-black">Listing</Link>
                         <Link href="/catalog" className="hover:text-black">Catalog</Link>
                         <Link href="/borrowing" className="hover:text-black">Borrowing</Link>
