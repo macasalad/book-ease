@@ -22,7 +22,7 @@ export default async function Dashboard() {
 
 return (
         <main className="min-h-screen bg-white text-black font-sans">
-            {/* 1. Top Gray Navigation Bar (Version B style) */}
+            {/* 1. Top Gray Navigation Bar */}
             <nav className="bg-[#e0e0e0] w-full">
                 <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between text-[15px] font-medium text-gray-700">
                     <div className="flex space-x-10">
@@ -40,7 +40,7 @@ return (
                 </div>
             </nav>
 
-            {/* 2. Logo and Search Bar Header (Combined Style) */}
+            {/* 2. Logo and Search Bar Header*/}
             <div className="max-w-7xl mx-auto px-6 py-8 flex items-center justify-between">
                 <div className="flex flex-col">
                     <h1 className="text-4xl font-bold tracking-tight text-black">BookEase</h1>
@@ -48,7 +48,7 @@ return (
                 </div>
                 
                 <div className="flex items-center flex-1 max-w-2xl ml-16 justify-end space-x-3">
-                    {/* Add Book Button (Merged from Version A) */}
+                    {/* Add Book Button*/}
                     <Link
                         href="/book_listing/new_book"
                         className="bg-black text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-all mr-4"
@@ -56,7 +56,7 @@ return (
                         + Add Book
                     </Link>
 
-                    {/* Pill-shaped Search Input (Version B) */}
+                    {/* Pill-shaped Search Input */}
                     <div className="flex-1 flex items-center bg-[#f0f1f2] rounded-full px-4 py-2 shadow-inner max-w-md">
                         <svg className="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -68,7 +68,7 @@ return (
                         />
                     </div>
                     
-                    {/* Filters Button (Version B) */}
+                    {/* Filters Button */}
                     <button className="bg-[#e0e0e0] text-gray-800 font-medium px-6 py-2 rounded-full flex items-center space-x-2 hover:bg-gray-300 transition-colors">
                         <span>Filters</span>
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,7 +78,7 @@ return (
                 </div>
             </div>
 
-            {/* 3. Main Grid Content (Version A Logic with Version B Wireframe Styling) */}
+            {/* 3. Main Grid Content */}
             <div className="max-w-7xl mx-auto px-6 py-4">
                 <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                     {data.items.map((b) => (
@@ -87,7 +87,7 @@ return (
                             href={`/book_listing/${b.id}`}
                             className="group block"
                         >
-                            {/* Book Cover Placeholder/Image (Wireframe X Style) */}
+                            {/* Book Cover Placeholder/Image */}
                             <div className="aspect-[3/4] w-full bg-[#d9d9d9] border-2 border-gray-300 relative flex items-center justify-center overflow-hidden rounded-lg shadow-sm group-hover:shadow-md transition-all">
                                 {b.photos && b.photos[0] ? (
                                     <img 
