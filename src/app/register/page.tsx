@@ -59,14 +59,14 @@ const Register = () => {
     }
   }
 
-  return (
-    <main className="flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 to-black p-4">
+return (
+    <main className="flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] p-4">
       <div className="relative w-full max-w-md">
-        {/* Same Animated background elements for consistency */}
+        {/* Animated background elements - now in Moss/Sage tones */}
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute rounded-full bg-blue-500/10"
+            className="absolute rounded-full bg-[#a3b18a]/30"
             initial={{
               width: `${50 + i * 20}px`,
               height: `${50 + i * 20}px`,
@@ -76,7 +76,7 @@ const Register = () => {
             }}
             animate={{
               scale: [1, 1.1, 1],
-              opacity: [0.2, 0.3, 0.2],
+              opacity: [0.2, 0.4, 0.2],
             }}
             transition={{
               duration: 4 + i,
@@ -88,14 +88,14 @@ const Register = () => {
         ))}
 
         <motion.div
-          className="relative z-10 flex flex-col rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-lg shadow-2xl"
+          className="relative z-10 flex flex-col rounded-2xl border border-white/60 bg-white/40 p-8 backdrop-blur-xl shadow-2xl shadow-stone-200/50"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         >
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white">Join BookEase</h1>
-            <p className="text-gray-400 mt-2">Create your account to get started</p>
+            <h1 className="text-3xl font-bold text-[#5c5c5c]">Join BookEase</h1>
+            <p className="text-[#8a8a8a] mt-2 font-medium">Create your account to get started</p>
           </div>
 
           <AnimatePresence>
@@ -104,7 +104,7 @@ const Register = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mb-4 overflow-hidden text-sm text-red-400 bg-red-500/10 border border-red-500/20 p-3 rounded-lg text-center"
+                className="mb-4 overflow-hidden text-sm text-[#8b4513] bg-red-100/50 border border-red-200 p-3 rounded-lg text-center"
               >
                 {error}
               </motion.div>
@@ -118,7 +118,7 @@ const Register = () => {
                 placeholder="Full Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                className="w-full bg-white/60 border border-[#a3b18a]/40 rounded-lg px-4 py-3 text-[#4a4a4a] placeholder-[#a0a0a0] focus:outline-none focus:ring-2 focus:ring-[#bc8a5f]/50 transition-all"
               />
             </div>
             <div>
@@ -127,7 +127,7 @@ const Register = () => {
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                className="w-full bg-white/60 border border-[#a3b18a]/40 rounded-lg px-4 py-3 text-[#4a4a4a] placeholder-[#a0a0a0] focus:outline-none focus:ring-2 focus:ring-[#bc8a5f]/50 transition-all"
               />
             </div>
             <div>
@@ -136,21 +136,21 @@ const Register = () => {
                 placeholder="Create Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                className="w-full bg-white/60 border border-[#a3b18a]/40 rounded-lg px-4 py-3 text-[#4a4a4a] placeholder-[#a0a0a0] focus:outline-none focus:ring-2 focus:ring-[#bc8a5f]/50 transition-all"
               />
             </div>
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-lg transition-colors shadow-lg shadow-blue-500/20 disabled:opacity-50 mt-2"
+              className="w-full bg-[#bc8a5f] hover:bg-[#a47148] text-white font-semibold py-3 rounded-lg transition-colors shadow-lg shadow-[#bc8a5f]/20 disabled:opacity-50 mt-2"
             >
               {isLoading ? "Creating Account..." : "Register"}
             </button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-gray-400">
+          <p className="mt-8 text-center text-sm text-[#8a8a8a]">
             Already have an account?{' '}
-            <Link href="/sign-in" className="text-blue-400 hover:text-blue-300 transition-colors font-medium">
+            <Link href="/sign-in" className="text-[#a47148] hover:text-[#8b4513] transition-colors font-bold">
               Log in here
             </Link>
           </p>
