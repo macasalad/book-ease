@@ -28,7 +28,7 @@ export default async function Profile() {
 
     return (
         <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] overflow-x-hidden relative font-sans">
-            {/* 1. Top Navigation Bar - Earth Themed */}
+            {/* 1. Top Navigation Bar */}
             <nav className="sticky top-0 z-50 w-full border-b border-[#a3b18a]/20 bg-white/20 backdrop-blur-md">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-[15px] font-medium">
                     {/* Navigation Links */}
@@ -56,12 +56,12 @@ export default async function Profile() {
                 </div>
             </nav>
 
-            {/* Background Decorative Circles (Earth Pastel Theme) */}
+            {/* Background Decorative Circles */}
             <div className="absolute top-20 left-10 w-72 h-72 bg-[#a3b18a]/20 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#bc8a5f]/10 rounded-full blur-[120px] pointer-events-none" />
 
             <div className="max-w-7xl mx-auto px-6 py-16 relative z-10">
-                {/* 2. Profile Header Section - CENTERED AND WIDER */}
+                {/* 2. Profile Header Section */}
                 <section className="flex flex-col md:flex-row gap-12 mb-16 items-center justify-center max-w-5xl mx-auto">
                     {/* Profile Picture Container */}
                     <div className="relative group shrink-0">
@@ -81,7 +81,7 @@ export default async function Profile() {
                         </div>
                     </div>
 
-                    {/* Bio and Info Container - WIDER */}
+                    {/* Bio and Info Container */}
                     <div className="flex-1 w-full">
                         <div className="p-8 md:p-10 rounded-[2rem] border border-white/60 bg-white/40 backdrop-blur-lg shadow-xl shadow-stone-200/50 space-y-6">
                             <h1 className="text-4xl font-bold tracking-tight text-[#4a4a4a]">User Profile</h1>
