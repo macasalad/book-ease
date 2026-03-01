@@ -23,7 +23,6 @@ const SignIn = () => {
     e.preventDefault()
     setError("")
     
-    // --- REQUIREMENT: Validate required fields ---
     if (!email || !password) {
       setError("Please enter both email and password.")
       return
@@ -32,7 +31,6 @@ const SignIn = () => {
     setIsLoading(true)
 
     try {
-      // --- REQUIREMENT: Validate credentials via Better Auth ---
       const { data, error: authError } = await authClient.signIn.email({
         email,
         password,
@@ -40,7 +38,6 @@ const SignIn = () => {
       })
 
       if (authError) {
-        // --- REQUIREMENT: Display error message and keep user on flow ---
         setError(authError.message || "Invalid email or password.")
         setIsLoading(false)
         return
@@ -49,7 +46,6 @@ const SignIn = () => {
       router.push('/')
       router.refresh()
     } catch (err) {
-      // --- REQUIREMENT: Handle system errors safely ---
       setError("A connection error occurred. Please try again.")
     } finally {
       setIsLoading(false)
@@ -57,13 +53,13 @@ const SignIn = () => {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 to-black p-4">
+    <main className="flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] p-4">
       <div className="relative w-full max-w-md">
-        {/* Animated background elements (keeping your cool circles) */}
+        {/* Animated background elements (Muted Moss/Sage) */}
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute rounded-full bg-blue-500/10"
+            className="absolute rounded-full bg-[#a3b18a]/20"
             initial={{
               width: `${50 + i * 20}px`,
               height: `${50 + i * 20}px`,
@@ -73,7 +69,7 @@ const SignIn = () => {
             }}
             animate={{
               scale: [1, 1.1, 1],
-              opacity: [0.2, 0.3, 0.2],
+              opacity: [0.2, 0.4, 0.2],
             }}
             transition={{
               duration: 4 + i,
@@ -85,14 +81,14 @@ const SignIn = () => {
         ))}
 
         <motion.div
-          className="relative z-10 flex flex-col rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-lg shadow-2xl"
+          className="relative z-10 flex flex-col rounded-2xl border border-white/60 bg-white/40 p-8 backdrop-blur-xl shadow-2xl shadow-stone-200/50"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         >
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
-            <p className="text-gray-400 mt-2">Sign in to BookEase</p>
+            <h1 className="text-3xl font-bold text-[#4a4a4a]">Welcome Back</h1>
+            <p className="text-[#8a8a8a] mt-2 font-medium">Sign in to BookEase</p>
           </div>
 
           {/* Error Message */}
@@ -102,7 +98,7 @@ const SignIn = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mb-4 overflow-hidden text-sm text-red-400 bg-red-500/10 border border-red-500/20 p-3 rounded-lg text-center"
+                className="mb-4 overflow-hidden text-sm text-[#8b4513] bg-red-100/50 border border-red-200 p-3 rounded-lg text-center"
               >
                 {error}
               </motion.div>
@@ -117,7 +113,7 @@ const SignIn = () => {
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                className="w-full bg-white/50 border border-[#a3b18a]/30 rounded-lg px-4 py-3 text-[#4a4a4a] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#bc8a5f]/50 transition-all"
               />
             </div>
             <div>
@@ -126,24 +122,24 @@ const SignIn = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                className="w-full bg-white/50 border border-[#a3b18a]/30 rounded-lg px-4 py-3 text-[#4a4a4a] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#bc8a5f]/50 transition-all"
               />
             </div>
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-lg transition-colors shadow-lg shadow-blue-500/20 disabled:opacity-50"
+              className="w-full bg-[#bc8a5f] hover:bg-[#a47148] text-white font-semibold py-3 rounded-lg transition-colors shadow-lg shadow-[#bc8a5f]/20 disabled:opacity-50"
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </button>
           </form>
 
           <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-white/10"></span></div>
-            <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#111827] px-2 text-gray-500">Or continue with</span></div>
+            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-[#a3b18a]/20"></span></div>
+            <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#f0ece4] px-2 text-[#8a8a8a]">Or continue with</span></div>
           </div>
 
-          {/* Google Button (Your original button) */}
+          {/* Google Button */}
           <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -153,18 +149,18 @@ const SignIn = () => {
             <button
               type="button"
               onClick={handleGoogleLogin}
-              className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg bg-white px-8 py-3 text-lg font-medium text-gray-900 shadow-lg transition-all"
+              className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg bg-white/80 px-8 py-3 text-lg font-medium text-[#4a4a4a] shadow-md transition-all border border-[#a3b18a]/20"
             >
               <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600"
+                className="absolute inset-0 bg-gradient-to-r from-[#bc8a5f] to-[#a47148]"
                 initial={{ x: '-100%' }}
                 animate={{ x: isHovering ? '0%' : '-100%' }}
                 transition={{ duration: 0.3 }}
               />
-              <span className="relative z-10 text-gray-900 transition-colors duration-300 group-hover:text-white">
+              <span className="relative z-10 transition-colors duration-300 group-hover:text-white">
                 Google
               </span>
-              <svg className="relative z-10 h-5 w-5" viewBox="0 0 24 24">
+              <svg className="relative z-10 h-5 w-5 transition-colors duration-300 group-hover:text-white" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                 <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                 <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
@@ -173,9 +169,9 @@ const SignIn = () => {
             </button>
           </motion.div>
 
-          <p className="mt-8 text-center text-sm text-gray-400">
+          <p className="mt-8 text-center text-sm text-[#8a8a8a]">
             Don't have an account?{' '}
-            <Link href="/register" className="text-blue-400 hover:text-blue-300 transition-colors font-medium">
+            <Link href="/register" className="text-[#a47148] hover:text-[#8b4513] transition-colors font-bold">
               Register here
             </Link>
           </p>
