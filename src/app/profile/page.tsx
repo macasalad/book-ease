@@ -24,7 +24,7 @@ export default async function Profile() {
 
     if (!user) return null;
 
-    const displayImage = user.image || "/default-avatar.png";
+    const displayImage = user.customImage || user.image || "/default-avatar.png";
 
     return (
         <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] overflow-x-hidden relative font-sans">
