@@ -2,10 +2,19 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@/generated/prisma/client";
+import { auth } from "@/auth";
 
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const formData = await request.formData();
 
   const title = String(formData.get("title") ?? "").trim();
@@ -57,6 +66,7 @@ export async function POST(request: Request) {
   // save to db
   const created = await prisma.bookListing.create({
     data: {
+      userId: session.user.id,   
       title, author, category, condition, isbn,
       description: description || null,
       photos: photoUrls,
