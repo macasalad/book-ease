@@ -54,24 +54,36 @@ export default function NewBookForm() {
     setIsbnMessage(null);
 
     try {
-      const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${form.isbn.trim()}`);
-      const data = await res.json();
-
-      if (data.items && data.items.length > 0) {
-        const bookInfo = data.items[0].volumeInfo;
-        setForm((prev) => ({
-          ...prev,
-          title: bookInfo.title || prev.title,
-          author: bookInfo.authors ? bookInfo.authors.join(", ") : prev.author,
-          category: bookInfo.categories ? bookInfo.categories[0] : prev.category,
-          description: bookInfo.description || prev.description,
-        }));
-        setIsbnMessage({ text: "Book details auto-filled successfully!", type: "success" });
-      } else {
-        setIsbnMessage({ text: "No matching book found. Please enter details manually.", type: "error" });
+      const res = await fetch(`https://openlibrary.org/isbn/${form.isbn.trim()}.json`);
+      if (!res.ok) {
+        setIsbnMessage({
+          text: "No matching book found. Please enter details manually.",
+          type: "error",
+        });
+        return;
       }
+  
+      const data = await res.json();
+      const authors = await Promise.all(
+        (data.authors || []).map(async (a: any) => {
+          const authorRes = await fetch(`https://openlibrary.org${a.key}.json`);
+          const authorData = await authorRes.json();
+          return authorData.name;
+        })
+      );
+  
+      setForm((prev) => ({
+        ...prev,
+        title: data.title || prev.title,
+        author: authors.join(", ") || prev.author,
+        category: data.subjects ? data.subjects[0] : prev.category,
+        description: data.description ? (typeof data.description === "string" ? data.description : data.description.value) : prev.description,
+      }));
+  
+      setIsbnMessage({ text: "Book details auto-filled successfully!", type: "success" });
     } catch (err) {
-      setIsbnMessage({ text: "Error connecting to book database.", type: "error" });
+      console.error(err);
+      setIsbnMessage({ text: "Error fetching book data.", type: "error" });
     } finally {
       setIsSearchingISBN(false);
     }
