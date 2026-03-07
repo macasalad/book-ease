@@ -5,6 +5,8 @@ CREATE TABLE "user" (
     "email" TEXT NOT NULL,
     "emailVerified" BOOLEAN NOT NULL DEFAULT false,
     "image" TEXT,
+    "customImage" TEXT,
+    "bio" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -65,9 +67,24 @@ CREATE TABLE "BookListing" (
     "condition" TEXT NOT NULL,
     "isbn" TEXT NOT NULL,
     "description" TEXT,
+    "photos" VARCHAR(500)[],
+    "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "BookListing_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Book" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "author" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'available',
+    "lenderId" TEXT NOT NULL,
+    "borrowerId" TEXT,
+
+    CONSTRAINT "Book_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -90,3 +107,12 @@ ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId"
 
 -- AddForeignKey
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "BookListing" ADD CONSTRAINT "BookListing_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Book" ADD CONSTRAINT "Book_lenderId_fkey" FOREIGN KEY ("lenderId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Book" ADD CONSTRAINT "Book_borrowerId_fkey" FOREIGN KEY ("borrowerId") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE;
