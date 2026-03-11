@@ -45,16 +45,23 @@ export default function NewBookForm() {
 
   // Google Books API ISBN Search
   const handleISBNSearch = async () => {
-    if (!form.isbn.trim()) {
+    const rawIsbn = form.isbn.trim();
+
+    if (!rawIsbn) {
       setIsbnMessage({ text: "Please enter an ISBN to search.", type: "error" });
       return;
     }
+
+    const cleanIsbn = rawIsbn.replace(/-/g, "");
 
     setIsSearchingISBN(true);
     setIsbnMessage(null);
 
     try {
-      const res = await fetch(`https://openlibrary.org/isbn/${form.isbn.trim()}.json`);
+      const res = await fetch(
+        `https://openlibrary.org/api/books?bibkeys=ISBN:${cleanIsbn}&jscmd=data&format=json`
+      );
+
       if (!res.ok) {
         setIsbnMessage({
           text: "No matching book found. Please enter details manually.",
@@ -62,25 +69,79 @@ export default function NewBookForm() {
         });
         return;
       }
-  
+
       const data = await res.json();
-      const authors = await Promise.all(
-        (data.authors || []).map(async (a: any) => {
-          const authorRes = await fetch(`https://openlibrary.org${a.key}.json`);
-          const authorData = await authorRes.json();
-          return authorData.name;
-        })
-      );
-  
+      const book = data[`ISBN:${cleanIsbn}`];
+
+      if (!book) {
+        setIsbnMessage({
+          text: "No matching book found. Please enter details manually.",
+          type: "error",
+        });
+        return;
+      }
+
+      const authors =
+        Array.isArray(book.authors) && book.authors.length > 0
+          ? book.authors
+              .map((a: { name?: string }) => a.name?.trim())
+              .filter(Boolean)
+              .join(", ")
+          : "";
+
+      const subjectNames: string[] =
+        Array.isArray(book.subjects) && book.subjects.length > 0
+          ? book.subjects
+              .map((s: { name?: string }) => s.name?.trim() ?? "")
+              .filter(Boolean)
+          : [];
+
+      const cleanSubjects = subjectNames.filter((subject) => {
+        const lower = subject.toLowerCase();
+
+        if (lower.startsWith("series:")) return false;
+        if (lower.startsWith("accessible book")) return false;
+        if (lower.startsWith("protected daisy")) return false;
+        if (lower.includes("_")) return false;
+        if (subject.length > 40) return false;
+
+        return true;
+      });
+
+      const preferredGenre =
+        cleanSubjects.find((subject) => {
+          const lower = subject.toLowerCase();
+
+          return (
+            lower.includes("fiction") ||
+            lower.includes("fantasy") ||
+            lower.includes("romance") ||
+            lower.includes("mystery") ||
+            lower.includes("thriller") ||
+            lower.includes("horror") ||
+            lower.includes("history") ||
+            lower.includes("science") ||
+            lower.includes("poetry") ||
+            lower.includes("drama") ||
+            lower.includes("adventure") ||
+            lower.includes("classic") ||
+            lower.includes("children") ||
+            lower.includes("young adult") ||
+            lower.includes("biography")
+          );
+        }) || cleanSubjects[0] || "";
+
       setForm((prev) => ({
         ...prev,
-        title: data.title || prev.title,
-        author: authors.join(", ") || prev.author,
-        category: data.subjects ? data.subjects[0] : prev.category,
-        description: data.description ? (typeof data.description === "string" ? data.description : data.description.value) : prev.description,
+        title: book.title || prev.title,
+        author: authors || prev.author,
+        category: preferredGenre || prev.category,
       }));
-  
-      setIsbnMessage({ text: "Book details auto-filled successfully!", type: "success" });
+
+      setIsbnMessage({
+        text: "Book details auto-filled successfully!",
+        type: "success",
+      });
     } catch (err) {
       console.error(err);
       setIsbnMessage({ text: "Error fetching book data.", type: "error" });
@@ -88,6 +149,7 @@ export default function NewBookForm() {
       setIsSearchingISBN(false);
     }
   };
+
 
   // Image size validation (5MB Limit)
   function onFilesSelected(files: FileList | null) {
