@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@/generated/prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { auth } from "@/auth";
 
 const prisma = new PrismaClient();
@@ -27,20 +27,6 @@ export async function POST(request: Request) {
   const photos = formData.getAll("photos") as File[];
   const photoUrls: string[] = [];
 
-  for (let i = 0; i < photos.length; i++) {
-    const file = photos[i];
-    const filename = `book_${Date.now()}_${i}.${file.name.split(".").pop()}`;
-    const buffer = Buffer.from(await file.arrayBuffer());
-    
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "book_covers");
-    const filepath = path.join(uploadDir, filename);
-    
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(filepath, buffer);
-    
-    photoUrls.push(`/uploads/book_covers/${filename}`);
-  }
-
   // required fields (everything except description)
   if (!title || !author || !category || !condition || !isbn) {
     return NextResponse.json(
@@ -63,11 +49,43 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid photo upload." }, { status: 400 });
   }
 
+  for (let i = 0; i < photos.length; i++) {
+    const file = photos[i];
+    const filename = `book_${Date.now()}_${i}.${file.name.split(".").pop()}`;
+    const buffer = Buffer.from(await file.arrayBuffer());
+    
+    const uploadDir = path.join(process.cwd(), "public", "uploads", "book_covers");
+    const filepath = path.join(uploadDir, filename);
+    
+    await mkdir(uploadDir, { recursive: true });
+    await writeFile(filepath, buffer);
+    
+    photoUrls.push(`/uploads/book_covers/${filename}`);
+  }
+
+  for (let i = 0; i < photos.length; i++) {
+    const file = photos[i];
+    const filename = `book_${Date.now()}_${i}.${file.name.split(".").pop()}`;
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    const uploadDir = path.join(process.cwd(), "public", "uploads", "book_covers");
+    const filepath = path.join(uploadDir, filename);
+
+    await mkdir(uploadDir, { recursive: true });
+    await writeFile(filepath, buffer);
+
+    photoUrls.push(`/uploads/book_covers/${filename}`);
+  }
+
   // save to db
   const created = await prisma.bookListing.create({
     data: {
-      userId: session.user.id,   
-      title, author, category, condition, isbn,
+      userId: session.user.id,
+      title,
+      author,
+      category,
+      condition,
+      isbn,
       description: description || null,
       photos: photoUrls,
     },
@@ -80,14 +98,14 @@ export async function POST(request: Request) {
 export async function GET() {
   const items = await prisma.bookListing.findMany({
     orderBy: { createdAt: "desc" },
-    select: { 
-      id: true, 
-      title: true, 
+    select: {
+      id: true,
+      title: true,
       photos: true,
-      author: true, 
-      category: true, 
+      author: true,
+      category: true,
       condition: true,
-      createdAt: true 
+      createdAt: true,
     },
     take: 24,
   });
