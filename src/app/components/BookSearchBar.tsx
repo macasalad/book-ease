@@ -8,15 +8,21 @@ type SearchItem = {
   title: string;
   author: string;
   image: string | null;
-  href: string;
-  source: "local" | "external";
 };
 
-export default function BookSearchBar() {
-  const [query, setQuery] = useState("");
+export default function BookSearchBar({
+  initialQuery = "",
+}: {
+  initialQuery?: string;
+}) {
+  const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<SearchItem[]>([]);
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setQuery(initialQuery);
+  }, [initialQuery]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -88,8 +94,8 @@ export default function BookSearchBar() {
             <>
               {results.map((book, index) => (
                 <Link
-                  key={`${book.source}-${book.id}-${index}`}
-                  href={book.href}
+                  key={`${book.id}-${index}`}
+                  href={`/dashboard?search=${encodeURIComponent(book.title)}`}
                   className="flex items-center gap-3 border-b border-[#eee7dc] px-4 py-3 hover:bg-[#f8f4ed] transition-colors"
                   onClick={() => setOpen(false)}
                 >
