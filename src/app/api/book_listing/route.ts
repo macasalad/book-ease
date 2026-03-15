@@ -63,20 +63,6 @@ export async function POST(request: Request) {
     photoUrls.push(`/uploads/book_covers/${filename}`);
   }
 
-  for (let i = 0; i < photos.length; i++) {
-    const file = photos[i];
-    const filename = `book_${Date.now()}_${i}.${file.name.split(".").pop()}`;
-    const buffer = Buffer.from(await file.arrayBuffer());
-
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "book_covers");
-    const filepath = path.join(uploadDir, filename);
-
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(filepath, buffer);
-
-    photoUrls.push(`/uploads/book_covers/${filename}`);
-  }
-
   // save to db
   const created = await prisma.bookListing.create({
     data: {

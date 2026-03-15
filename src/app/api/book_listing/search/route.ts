@@ -13,19 +13,46 @@ type SearchItem = {
 };
 
 type OpenLibraryDoc = {
-  key?: string;
+  edition_key?: string[];
+};
+
+type OpenLibraryBook = {
   title?: string;
-  author_name?: string[];
-  cover_i?: number;
+  authors?: { key: string }[];
 };
 
 function notNull<T>(value: T | null): value is T {
   return value !== null;
 }
 
+async function fetchOpenLibraryBook(olid: string): Promise<SearchItem | null> {
+  try {
+    const res = await fetch(`https://openlibrary.org/books/${olid}.json`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) return null;
+
+    const book: OpenLibraryBook = await res.json();
+
+    const title = book.title?.trim();
+    if (!title) return null;
+
+    return {
+      id: `ol_${olid}`,
+      title,
+      author: "Unknown Author",
+      image: `https://covers.openlibrary.org/b/olid/${olid}-M.jpg`,
+      href: `https://openlibrary.org/books/${olid}`,
+      source: "external",
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function GET(request: NextRequest) {
   const q = request.nextUrl.searchParams.get("q")?.trim() ?? "";
-  const normalizedQuery = q.toLowerCase();
 
   if (q.length < 1) {
     return NextResponse.json({ items: [] });
@@ -65,67 +92,32 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ items: mappedLocal });
   }
 
-  const seen = new Set(
-    mappedLocal.map(
-      (item) => `${item.title.toLowerCase()}::${item.author.toLowerCase()}`
-    )
-  );
-
   let externalResults: SearchItem[] = [];
 
   try {
-    const openLibraryRes = await fetch(
-      `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=20`,
+    const res = await fetch(
+      `https://openlibrary.org/search.json?title=${encodeURIComponent(q)}&limit=10`,
       { cache: "no-store" }
     );
 
-    if (openLibraryRes.ok) {
-      const openLibraryData = await openLibraryRes.json();
+    if (res.ok) {
+      const data = await res.json();
 
-      const docs: OpenLibraryDoc[] = Array.isArray(openLibraryData.docs)
-        ? openLibraryData.docs
-        : [];
+      const docs: OpenLibraryDoc[] = Array.isArray(data.docs) ? data.docs : [];
 
-      externalResults = docs
-        .map((doc, index): SearchItem | null => {
-          const title = doc.title?.trim() ?? "";
-          const author = doc.author_name?.[0]?.trim() ?? "Unknown Author";
-
-          if (!title || !doc.key) return null;
-
-          const titleLower = title.toLowerCase();
-          const authorLower = author.toLowerCase();
-
-          const matchesTypedText =
-            q.length <= 2
-              ? titleLower.startsWith(normalizedQuery) ||
-                authorLower.startsWith(normalizedQuery)
-              : titleLower.includes(normalizedQuery) ||
-                authorLower.includes(normalizedQuery);
-
-          if (!matchesTypedText) return null;
-
-          const dedupeKey = `${titleLower}::${authorLower}`;
-          if (seen.has(dedupeKey)) return null;
-
-          seen.add(dedupeKey);
-
-          return {
-            id: `ol_${index}_${doc.key}`,
-            title,
-            author,
-            image: doc.cover_i
-              ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`
-              : null,
-            href: `https://openlibrary.org${doc.key}`,
-            source: "external",
-          };
-        })
-        .filter(notNull)
+      const editionIds = docs
+        .map((doc) => doc.edition_key?.[0])
+        .filter(Boolean)
         .slice(0, 5 - mappedLocal.length);
+
+      const books = await Promise.all(
+        editionIds.map((olid) => fetchOpenLibraryBook(olid as string))
+      );
+
+      externalResults = books.filter(notNull);
     }
-  } catch {
-    externalResults = [];
+  } catch (err) {
+    console.error("OpenLibrary fetch failed:", err);
   }
 
   return NextResponse.json({
