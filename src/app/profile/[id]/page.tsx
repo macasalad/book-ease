@@ -14,15 +14,15 @@ export default async function UserProfile({ params }: ProfileProps) {
   const resolvedParams = await params;
   const rawId = resolvedParams?.id;
   
-  // Safety guard: If there is no ID in the URL, show 404
+  // Show 404 page if URL parameter does not resolve to a valid id
   if (!rawId) {
     return notFound();
   }
 
-  // 2. Decode the ID to fix any URL-encoding issues (e.g. %7C back to |)
+  // Decode encoded URL characters (e.g. %7C back to |)
   const id = decodeURIComponent(rawId);
 
-  // 3. Fetch the user profile corresponding to the URL parameter
+  // Fetch user profile that has the id in the URL
   const profileUser = await prisma.user.findUnique({
     where: { id: id },
     include: {
@@ -31,17 +31,17 @@ export default async function UserProfile({ params }: ProfileProps) {
     }
   });
 
-  // If no user exists with this ID in the database, show a 404 page
+  // Show 404 page if no user exists with this ID in the database
   if (!profileUser) {
     return notFound();
   }
 
-  // 4. Check the currently logged-in user session
+  // Get the current session 
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  // 5. Determine if the logged-in user is viewing their own profile
+  // Determine if the current logged-in user is viewing their own profile
   let isOwnProfile = false;
   if (session?.user?.email) {
     const loggedInUser = await prisma.user.findUnique({
