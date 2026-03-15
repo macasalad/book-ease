@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { PrismaClient } from "@prisma/client";
 import ReturnBookButton from "@/components/ReturnBookButton";
+import Link from "next/link";
+import { SignOutButton } from "@/components/SignOutButton";
 
 const prisma = new PrismaClient();
 
@@ -94,149 +96,160 @@ export default async function BorrowingPage() {
   });
 
   return (
-    <main className="min-h-screen p-6 md:p-10 bg-[#f2ece4]">
-      <h1 className="text-3xl font-bold mb-8">My Borrowed Books</h1>
+    <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] overflow-x-hidden relative font-sans">
+      
+      {/* Navigation Bar */}
+      <nav className="sticky top-0 z-50 w-full border-b border-[#a3b18a]/20 bg-white/20 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-[15px] font-medium">
+          <div className="flex space-x-10 text-[#8a8a8a]">
+            <Link href="/dashboard" className="hover:text-[#bc8a5f] transition-colors">Home</Link>
+            <Link href="/listing" className="hover:text-[#bc8a5f] transition-colors">Listing</Link>
+            <Link href="/catalog" className="hover:text-[#bc8a5f] transition-colors">Catalog</Link>
+            <Link href="/borrowing" className="text-[#4a4a4a] font-bold relative after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-0.5 after:bg-[#bc8a5f] after:rounded-full">
+              Borrowing
+            </Link>
+            <Link href="/lending" className="hover:text-[#bc8a5f] transition-colors">Lending</Link>
+            <Link href="/messages" className="hover:text-[#bc8a5f] transition-colors">Messages</Link>
+          </div>
+          <div className="flex space-x-8 items-center">
+            <Link href="/profile" className="hover:text-[#bc8a5f] transition-colors font-bold">My Account</Link>
+            <div className="opacity-80 hover:opacity-100 transition-opacity">
+              <SignOutButton />
+            </div>
+          </div>
+        </div>
+      </nav>
 
-      {/* Currently Borrowed Section */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-          Currently Borrowed ({activeBorrows.length})
-        </h2>
+      {/* Background Decorative Circles */}
+      <div className="absolute top-40 left-10 w-72 h-72 bg-[#a3b18a]/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#bc8a5f]/10 rounded-full blur-[120px] pointer-events-none" />
 
-        {activeBorrows.length === 0 ? (
-          <p className="text-gray-500 bg-white p-6 rounded-2xl shadow-sm">
-            You haven't borrowed any books yet.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {activeBorrows.map((borrow) => (
-              <div key={borrow.id} className="bg-white rounded-2xl p-6 shadow-md">
-                <div className="flex gap-4">
-                  {/* Book Image */}
-                  <div className="w-24 h-32 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+        <h1 className="text-3xl font-bold tracking-tight text-[#4a4a4a] mb-4">My Borrowed Books</h1>
+
+        {/* Currently Borrowed Section */}
+        <section className="mb-4">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-[#4a4a4a]">
+            <span className="w-2.5 h-2.5 bg-[#5a7d5a] rounded-full shadow-sm"></span>
+            Currently Borrowed ({activeBorrows.length})
+          </h2>
+
+          {activeBorrows.length === 0 ? (
+            <p className="text-[#8a8a8a] bg-white/40 border border-white/60 p-6 rounded-[1.5rem] shadow-sm backdrop-blur-md">
+              You haven't borrowed any books yet.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {activeBorrows.map((borrow) => (
+                <div key={borrow.id} className="bg-white/40 border border-white/60 rounded-[1.5rem] p-5 shadow-lg shadow-stone-200/30 backdrop-blur-md hover:bg-white/60 transition-all flex flex-col sm:flex-row gap-5">
+                  {/* Standardized Book Image */}
+                  <div className="w-24 h-32 rounded-xl overflow-hidden border border-white/50 shadow-inner bg-[#e2d9c8]/50 shrink-0 flex items-center justify-center">
                     {borrow.book.photos[0] ? (
-                      <img
-                        src={borrow.book.photos[0]}
-                        alt={borrow.book.title}
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={borrow.book.photos[0]} alt={borrow.book.title} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="flex items-center justify-center w-full h-full bg-gray-100 text-4xl">
-                        📚
-                      </div>
+                      <span className="text-4xl opacity-50">📖</span>
                     )}
                   </div>
-
-                  {/* Book Info */}
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold">{borrow.book.title}</h3>
-                    <p className="text-gray-600">by {borrow.book.author}</p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Lent by: {borrow.book.user.name}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Borrowed on: {new Date(borrow.borrowedAt).toLocaleDateString()}
-                    </p>
-                    
-                    {/* Return Button */}
-                    <div className="mt-4">
-                      <ReturnBookButton 
-                        borrowId={borrow.id}
-                        bookId={borrow.book.id}
-                      />
+                  {/* Standardized Book Info */}
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-[#4a4a4a] leading-tight">{borrow.book.title}</h3>
+                      <p className="text-sm text-[#8a8a8a]">by {borrow.book.author}</p>
+                      <div className="mt-2 text-sm text-[#5c5c5c] space-y-0.5">
+                        <p><span className="font-semibold">Lent by:</span> {borrow.book.user.name}</p>
+                        <p><span className="font-semibold">Borrowed:</span> {new Date(borrow.borrowedAt).toLocaleDateString()}</p>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Pending Requests Section */}
-      {pendingRequests.length > 0 && (
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-            <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
-            Pending Requests ({pendingRequests.length})
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {pendingRequests.map((request) => (
-              <div key={request.id} className="bg-white rounded-2xl p-6 shadow-md border-l-4 border-yellow-500">
-                <div className="flex gap-4">
-                  <div className="w-20 h-24 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
-                    {request.book.photos[0] ? (
-                      <img
-                        src={request.book.photos[0]}
-                        alt={request.book.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center w-full h-full bg-gray-100">
-                        📖
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="font-bold">{request.book.title}</h3>
-                    <p className="text-sm text-gray-600">by {request.book.author}</p>
-                    <p className="text-sm text-gray-500">Owner: {request.book.user.name}</p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      Requested: {new Date(request.createdAt).toLocaleDateString()}
-                    </p>
-                    <span className="inline-block mt-2 px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">
-                      Pending approval
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Borrowing History Section */}
-      {borrowHistory.length > 0 && (
-        <section>
-          <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-            <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
-            History
-          </h2>
-
-          <div className="bg-white rounded-2xl p-6 shadow-md">
-            <div className="space-y-4">
-              {borrowHistory.map((borrow) => (
-                <div key={borrow.id} className="flex items-center gap-4 pb-4 border-b border-gray-100 last:border-0">
-                  <div className="w-12 h-16 rounded overflow-hidden border border-gray-200 flex-shrink-0">
-                    {borrow.book.photos[0] ? (
-                      <img
-                        src={borrow.book.photos[0]}
-                        alt={borrow.book.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center w-full h-full bg-gray-100">
-                        📖
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium">{borrow.book.title}</h4>
-                    <p className="text-sm text-gray-600">by {borrow.book.author}</p>
-                    <p className="text-xs text-gray-500">
-                      From {borrow.book.user.name} • 
-                      Borrowed: {new Date(borrow.borrowedAt).toLocaleDateString()} • 
-                      Returned: {new Date(borrow.returnedAt!).toLocaleDateString()}
-                    </p>
+                    <div className="mt-3">
+                      <ReturnBookButton borrowId={borrow.id} bookId={borrow.book.id} />
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          )}
         </section>
-      )}
+
+        {/* Pending Requests Section */}
+        {pendingRequests.length > 0 && (
+          <section className="mb-2">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-[#4a4a4a]">
+              <span className="w-2.5 h-2.5 bg-[#bc8a5f] rounded-full shadow-sm"></span>
+              Pending Requests ({pendingRequests.length})
+            </h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {pendingRequests.map((request) => (
+                <div key={request.id} className="bg-white/40 border border-white/60 rounded-[1.5rem] p-5 shadow-lg shadow-stone-200/30 backdrop-blur-md hover:bg-white/60 transition-all flex flex-col sm:flex-row gap-5">
+                  <div className="w-24 h-32 rounded-xl overflow-hidden border border-white/50 shadow-inner bg-[#e2d9c8]/50 shrink-0 flex items-center justify-center">
+                    {request.book.photos[0] ? (
+                      <img src={request.book.photos[0]} alt={request.book.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-4xl opacity-50">📖</span>
+                    )}
+                  </div>
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-[#4a4a4a] leading-tight">{request.book.title}</h3>
+                      <p className="text-sm text-[#8a8a8a]">by {request.book.author}</p>
+                      <div className="mt-2 text-sm text-[#5c5c5c] space-y-0.5">
+                        <p><span className="font-semibold">Owner:</span> {request.book.user.name}</p>
+                        <p><span className="font-semibold">Requested:</span> {new Date(request.createdAt).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <span className="inline-block px-3 py-1.5 bg-[#bc8a5f]/20 text-[#a47148] border border-[#bc8a5f]/30 text-xs font-bold uppercase tracking-wider rounded-full w-max">
+                        Pending approval
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Borrowing History Section */}
+        {borrowHistory.length > 0 && (
+          <section className="mb-4">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-[#4a4a4a]">
+              <span className="w-2.5 h-2.5 bg-[#a3b18a] rounded-full shadow-sm"></span>
+              History
+            </h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {borrowHistory.map((borrow) => (
+                <div key={borrow.id} className="bg-white/40 border border-white/60 rounded-[1.5rem] p-5 shadow-lg shadow-stone-200/30 backdrop-blur-md hover:bg-white/60 transition-all flex flex-col sm:flex-row gap-5">
+                  <div className="w-24 h-32 rounded-xl overflow-hidden border border-white/50 shadow-inner bg-[#e2d9c8]/50 shrink-0 flex items-center justify-center">
+                    {borrow.book.photos[0] ? (
+                      <img src={borrow.book.photos[0]} alt={borrow.book.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-4xl opacity-50">📖</span>
+                    )}
+                  </div>
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-[#4a4a4a] leading-tight">{borrow.book.title}</h3>
+                      <p className="text-sm text-[#8a8a8a]">by {borrow.book.author}</p>
+                      <div className="mt-2 text-sm text-[#5c5c5c] space-y-0.5">
+                        <p><span className="font-semibold">From:</span> {borrow.book.user.name}</p>
+                        <p><span className="font-semibold">Borrowed:</span> {new Date(borrow.borrowedAt).toLocaleDateString()}
+                        <span className="font-semibold"> Returned:</span> {new Date(borrow.returnedAt!).toLocaleDateString()} </p>
+
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <span className="inline-block px-3 py-1.5 bg-[#a3b18a]/20 text-[#5a7d5a] border border-[#a3b18a]/30 text-xs font-bold uppercase tracking-wider rounded-full w-max">
+                        Returned
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
     </main>
   );
 }
