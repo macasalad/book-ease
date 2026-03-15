@@ -92,6 +92,14 @@ export async function GET() {
       category: true,
       condition: true,
       createdAt: true,
+      status: true,
+      user: {
+        select: {
+          name: true,
+          id: true,
+        }
+      },
+
     },
     take: 24,
   });

@@ -1,3 +1,9 @@
+-- CreateEnum
+CREATE TYPE "RequestStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
+
+-- CreateEnum
+CREATE TYPE "BookStatus" AS ENUM ('AVAILABLE', 'BORROWED');
+
 -- CreateTable
 CREATE TABLE "user" (
     "id" TEXT NOT NULL,
@@ -68,6 +74,7 @@ CREATE TABLE "BookListing" (
     "isbn" TEXT NOT NULL,
     "description" TEXT,
     "photos" VARCHAR(500)[],
+    "status" "BookStatus" NOT NULL DEFAULT 'AVAILABLE',
     "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -76,15 +83,28 @@ CREATE TABLE "BookListing" (
 );
 
 -- CreateTable
-CREATE TABLE "Book" (
+CREATE TABLE "BorrowRequest" (
     "id" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
-    "author" TEXT NOT NULL,
-    "status" TEXT NOT NULL DEFAULT 'available',
+    "status" "RequestStatus" NOT NULL DEFAULT 'PENDING',
+    "borrowerId" TEXT NOT NULL,
     "lenderId" TEXT NOT NULL,
-    "borrowerId" TEXT,
+    "bookId" TEXT NOT NULL,
+    "borrowDate" TIMESTAMP(3),
+    "returnDate" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "Book_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "BorrowRequest_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "BorrowRecord" (
+    "id" TEXT NOT NULL,
+    "bookId" TEXT NOT NULL,
+    "borrowerId" TEXT NOT NULL,
+    "borrowedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "returnedAt" TIMESTAMP(3),
+
+    CONSTRAINT "BorrowRecord_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -112,7 +132,16 @@ ALTER TABLE "account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId"
 ALTER TABLE "BookListing" ADD CONSTRAINT "BookListing_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Book" ADD CONSTRAINT "Book_lenderId_fkey" FOREIGN KEY ("lenderId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "BorrowRequest" ADD CONSTRAINT "BorrowRequest_borrowerId_fkey" FOREIGN KEY ("borrowerId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Book" ADD CONSTRAINT "Book_borrowerId_fkey" FOREIGN KEY ("borrowerId") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "BorrowRequest" ADD CONSTRAINT "BorrowRequest_lenderId_fkey" FOREIGN KEY ("lenderId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "BorrowRequest" ADD CONSTRAINT "BorrowRequest_bookId_fkey" FOREIGN KEY ("bookId") REFERENCES "BookListing"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "BorrowRecord" ADD CONSTRAINT "BorrowRecord_bookId_fkey" FOREIGN KEY ("bookId") REFERENCES "BookListing"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "BorrowRecord" ADD CONSTRAINT "BorrowRecord_borrowerId_fkey" FOREIGN KEY ("borrowerId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

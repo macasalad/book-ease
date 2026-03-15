@@ -14,26 +14,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum BookStatus {
+  AVAILABLE
+  BORROWED
+}
+
 model User {
-  id            String    @id
+  id            String   @id
   name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?     // default image from Google account
-  customImage   String?     // User-uploaded image
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  customImage   String?
   bio           String?
 
-  // Relationships
-  lentBooks     Book[]    @relation("LentBooks")
-  borrowedBooks Book[]    @relation("BorrowedBooks")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+
+  // Books owned by the user
   bookListings  BookListing[]
-  
-  @@unique([email])
+
+  // Borrow requests
+  borrowRequestsSent     BorrowRequest[] @relation("BorrowerRequests")
+  borrowRequestsReceived BorrowRequest[] @relation("LenderRequests")
+
+  // Borrow history
+  borrowRecords BorrowRecord[]
+
   @@map("user")
 }
 
@@ -95,23 +111,47 @@ model BookListing {
   description String?
   photos      String[] @db.VarChar(500)
 
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status      BookStatus @default(AVAILABLE)
+
+  userId     String
+  user       User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  borrowRequests BorrowRequest[]
+  borrowRecords  BorrowRecord[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
-model Book {
-  id          String   @id @default(cuid())
-  title       String
-  author      String
-  status      String   @default("available") // e.g., available, borrowed
-  
-  // The person who owns the book
-  lenderId    String
-  lender      User     @relation("LentBooks", fields: [lenderId], references: [id])
 
-  // The person currently borrowing it (optional)
-  borrowerId  String?
-  borrower    User?    @relation("BorrowedBooks", fields: [borrowerId], references: [id])
+model BorrowRequest {
+  id        String   @id @default(cuid())
+
+  status    RequestStatus @default(PENDING)
+
+  borrowerId String
+  borrower   User @relation("BorrowerRequests", fields: [borrowerId], references: [id])
+
+  lenderId   String
+  lender     User @relation("LenderRequests", fields: [lenderId], references: [id])
+
+  bookId     String
+  book       BookListing @relation(fields: [bookId], references: [id])
+
+  borrowDate DateTime?
+  returnDate DateTime?
+
+  createdAt  DateTime @default(now())
+}
+
+model BorrowRecord {
+  id        String   @id @default(cuid())
+
+  bookId    String
+  book      BookListing @relation(fields: [bookId], references: [id])
+
+  borrowerId String
+  borrower   User @relation(fields: [borrowerId], references: [id])
+
+  borrowedAt DateTime @default(now())
+  returnedAt DateTime?
 }
