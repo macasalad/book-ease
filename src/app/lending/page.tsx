@@ -4,7 +4,9 @@ import { auth } from "@/auth";
 import AcceptRejectRequest from "@/components/AcceptRejectRequest";
 import Link from "next/link";
 import { SignOutButton } from "@/components/SignOutButton";
-import { prisma } from "@/lib/prisma"; // Shared instance to prevent DB errors
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export default async function LendingPage() {
   const session = await auth.api.getSession({ headers: await headers() });
