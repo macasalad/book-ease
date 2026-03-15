@@ -104,5 +104,10 @@ export async function GET() {
     take: 24,
   });
 
-  return NextResponse.json({ items });
+  const itemsWithBorrowStatus = items.map((item: { status: string; }) => ({
+      ...item,
+      isBorrowed: item.status === "BORROWED" 
+    }));
+
+  return NextResponse.json({ items: itemsWithBorrowStatus });
 }
