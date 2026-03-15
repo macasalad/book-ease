@@ -11,6 +11,7 @@ type Listing = {
   photos: string[] | null;
   author: string;
   condition: string;
+  isBorrowed?: boolean;
 };
 
 export default async function Dashboard({
@@ -138,6 +139,20 @@ export default async function Dashboard({
                 <div className="mt-4 inline-block px-3 py-1.5 bg-[#a3b18a]/20 text-[#5a7d5a] text-xs font-bold uppercase tracking-wider rounded-full w-max">
                   {b.condition ? b.condition.replace("_", " ") : "Available"}
                 </div>
+              </div>
+
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+
+                {b.isBorrowed ? (
+                  <span className="px-3 py-1.5 bg-[#a3b18a]/20 text-[#5a7d5a] text-xs font-bold uppercase tracking-wider rounded-full shadow-sm">
+                    Borrowed
+                  </span>
+                ) : (
+                  <span className="px-3 py-1.5 bg-[#a3b18a]/20 text-[#5a7d5a] text-xs font-bold uppercase tracking-wider rounded-full shadow-sm">
+                    Available
+                  </span>
+                )}
+
               </div>
             </Link>
           ))}
