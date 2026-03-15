@@ -41,7 +41,6 @@ export default function AcceptRejectRequest({
   }
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-md flex flex-col md:flex-row gap-4 items-center">
     <div className="bg-white/40 border border-white/60 rounded-[1.5rem] p-5 shadow-lg shadow-stone-200/30 backdrop-blur-md hover:bg-white/60 transition-all flex flex-col sm:flex-row gap-5 items-center relative overflow-hidden">
       
       {/* Book Image */}
