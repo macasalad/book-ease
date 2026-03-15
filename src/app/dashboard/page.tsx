@@ -144,7 +144,7 @@ export default async function Dashboard({
               <div className="mt-2 flex flex-wrap items-center gap-2">
 
                 {b.isBorrowed ? (
-                  <span className="px-3 py-1.5 bg-[#a3b18a]/20 text-[#5a7d5a] text-xs font-bold uppercase tracking-wider rounded-full shadow-sm">
+                  <span className="px-3 py-1.5 bg-[#a3b18a]/20 text-[#7D1128] text-xs font-bold uppercase tracking-wider rounded-full shadow-sm">
                     Borrowed
                   </span>
                 ) : (
