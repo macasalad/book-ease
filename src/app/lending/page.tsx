@@ -1,8 +1,10 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { PrismaClient, RequestStatus } from "@prisma/client";
 import AcceptRejectRequest from "@/components/AcceptRejectRequest";
+import Link from "next/link";
+import { SignOutButton } from "@/components/SignOutButton";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -26,18 +28,56 @@ export default async function LendingPage() {
   });
 
   return (
-    <main className="min-h-screen p-6 md:p-10 bg-[#f2ece4]">
-      <h1 className="text-3xl font-bold mb-6">Borrow Requests</h1>
-
-      {requests.length === 0 ? (
-        <p className="text-gray-500">No borrow requests yet.</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {requests.map((req) => (
-            <AcceptRejectRequest key={req.id} request={req} />
-          ))}
+    <main className="h-screen overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] relative font-sans">
+      
+      {/* Navigation Bar */}
+      <nav className="sticky top-0 z-50 w-full border-b border-[#a3b18a]/20 bg-white/20 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-[15px] font-medium">
+          <div className="flex space-x-10 text-[#8a8a8a]">
+            <Link href="/dashboard" className="hover:text-[#bc8a5f] transition-colors">Home</Link>
+            <Link href="/listing" className="hover:text-[#bc8a5f] transition-colors">Listing</Link>
+            <Link href="/catalog" className="hover:text-[#bc8a5f] transition-colors">Catalog</Link>
+            <Link href="/borrowing" className="hover:text-[#bc8a5f] transition-colors">Borrowing</Link>
+            <Link href="/lending" className="text-[#4a4a4a] font-bold relative after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-0.5 after:bg-[#bc8a5f] after:rounded-full">
+              Lending
+            </Link>
+            <Link href="/messages" className="hover:text-[#bc8a5f] transition-colors">Messages</Link>
+          </div>
+          <div className="flex space-x-8 items-center">
+            <Link href="/profile" className="hover:text-[#bc8a5f] transition-colors font-bold">My Account</Link>
+            <div className="opacity-80 hover:opacity-100 transition-opacity">
+              <SignOutButton />
+            </div>
+          </div>
         </div>
-      )}
+      </nav>
+
+      {/* Decorative Background Circles */}
+      <div className="absolute top-40 left-10 w-72 h-72 bg-[#a3b18a]/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#bc8a5f]/10 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+        <h1 className="text-3xl font-bold tracking-tight text-[#4a4a4a] mb-8">Lending Dashboard</h1>
+
+        <section className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-[#4a4a4a]">
+            <span className="w-2.5 h-2.5 bg-[#bc8a5f] rounded-full shadow-sm"></span>
+            Borrow Requests ({requests.length})
+          </h2>
+
+          {requests.length === 0 ? (
+            <div className="bg-white/40 border border-white/60 p-8 rounded-[1.5rem] shadow-sm backdrop-blur-md text-center">
+              <p className="text-[#8a8a8a]">You don't have any borrow requests yet.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {requests.map((req) => (
+                <AcceptRejectRequest key={req.id} request={req} />
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
     </main>
   );
 }
