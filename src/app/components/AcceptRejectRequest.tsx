@@ -42,7 +42,10 @@ export default function AcceptRejectRequest({
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-md flex flex-col md:flex-row gap-4 items-center">
-      <div className="w-24 h-32 rounded-lg overflow-hidden border border-gray-200">
+    <div className="bg-white/40 border border-white/60 rounded-[1.5rem] p-5 shadow-lg shadow-stone-200/30 backdrop-blur-md hover:bg-white/60 transition-all flex flex-col sm:flex-row gap-5 items-center relative overflow-hidden">
+      
+      {/* Book Image */}
+      <div className="w-24 h-32 rounded-xl overflow-hidden border border-white/40 shadow-inner bg-[#e2d9c8]/50 shrink-0 flex items-center justify-center">
         {request.book.photos[0] ? (
           <img
             src={request.book.photos[0]}
@@ -50,56 +53,55 @@ export default function AcceptRejectRequest({
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="flex items-center justify-center w-full h-full bg-gray-100">
-            📖
-          </div>
+          <span className="text-4xl opacity-50">📖</span>
         )}
       </div>
 
-      <div className="flex-1">
-        <h2 className="text-lg font-bold">{request.book.title}</h2>
-        <p className="text-gray-600">
-          Borrower: {request.borrower.name}
-        </p>
-        <p className="text-gray-500 text-sm">
-          Requested on: {new Date(request.createdAt).toLocaleDateString()}
-        </p>
+      <div className="flex-1 w-full sm:w-auto">
+        <h2 className="text-lg font-bold text-[#4a4a4a] leading-tight">{request.book.title}</h2>
         
-        {request.returnDate && (
-          <p className="text-gray-500 text-sm">
-            Return Date: {new Date(request.returnDate).toLocaleDateString()}
+        <div className="mt-2 space-y-0.5">
+          <p className="text-sm text-[#5c5c5c]">
+            <span className="font-semibold text-[#8a8a8a]">Borrower:</span> {request.borrower.name}
           </p>
-        )}
+          <p className="text-xs text-[#8a8a8a]">
+            <span className="font-semibold">Requested:</span> {new Date(request.createdAt).toLocaleDateString()}
+          </p>
+          {request.returnDate && (
+            <p className="text-xs text-[#8a8a8a]">
+              <span className="font-semibold text-[#bc8a5f]">Return by:</span> {new Date(request.returnDate).toLocaleDateString()}
+            </p>
+          )}
+        </div>
         
-        <p className="mt-2">
-          Status:{" "}
+        <div className="mt-3">
           <span
-            className={`font-semibold ${
+            className={`px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${
               status === "PENDING"
-                ? "text-yellow-600"
+                ? "bg-[#bc8a5f]/10 text-[#bc8a5f] border-[#bc8a5f]/20"
                 : status === "APPROVED"
-                ? "text-green-600"
-                : "text-red-600"
+                ? "bg-[#a3b18a]/20 text-[#5a7d5a] border-[#a3b18a]/30"
+                : "bg-red-50 text-red-400 border-red-100"
             }`}
           >
             {status}
           </span>
-        </p>
+        </div>
       </div>
 
       {status === "PENDING" && (
-        <div className="flex gap-2 mt-4 md:mt-0">
+        <div className="flex gap-2 w-full sm:w-auto mt-4 sm:mt-0">
           <button
             onClick={() => handleAction("APPROVED")}
             disabled={loading}
-            className="px-4 py-2 rounded-full bg-green-600 text-white font-semibold hover:bg-green-700"
+            className="flex-1 sm:flex-none px-6 py-2 bg-[#a3b18a] hover:bg-[#8da074] text-white text-sm font-bold rounded-full transition-all shadow-md shadow-[#a3b18a]/20 disabled:opacity-50"
           >
             {loading ? "..." : "Accept"}
           </button>
           <button
             onClick={() => handleAction("REJECTED")}
             disabled={loading}
-            className="px-4 py-2 rounded-full bg-red-600 text-white font-semibold hover:bg-red-700"
+            className="flex-1 sm:flex-none px-6 py-2 bg-white/50 hover:bg-red-50 text-[#8a8a8a] hover:text-red-400 border border-[#a3b18a]/20 text-sm font-bold rounded-full transition-all disabled:opacity-50"
           >
             {loading ? "..." : "Reject"}
           </button>
