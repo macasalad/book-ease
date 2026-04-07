@@ -81,8 +81,38 @@ export async function POST(request: Request) {
   return NextResponse.json({ ok: true, listing: created }, { status: 201 });
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  // Extract query parameters from the URL
+  const { searchParams } = new URL(request.url);
+  const search = searchParams.get("search");
+  const category = searchParams.get("category");
+  const condition = searchParams.get("condition");
+  const status = searchParams.get("status");
+
+  // Build the dynamic 'where' object for Prisma
+  const where: any = {};
+
+  if (search) {
+    where.OR = [
+      { title: { contains: search, mode: "insensitive" } },
+      { author: { contains: search, mode: "insensitive" } },
+    ];
+  }
+
+  if (category) {
+    where.category = category;
+  }
+
+  if (condition) {
+    where.condition = condition;
+  }
+
+  if (status) {
+    where.status = status;
+  }
+
   const items = await prisma.bookListing.findMany({
+    where, // Apply the filters here
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
@@ -99,15 +129,14 @@ export async function GET() {
           id: true,
         }
       },
-
     },
     take: 24,
   });
 
   const itemsWithBorrowStatus = items.map((item: { status: string; }) => ({
-      ...item,
-      isBorrowed: item.status === "BORROWED" 
-    }));
+    ...item,
+    isBorrowed: item.status === "BORROWED" 
+  }));
 
   return NextResponse.json({ items: itemsWithBorrowStatus });
 }
