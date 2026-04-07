@@ -54,8 +54,7 @@ export default function BookFilters() {
 
         setIsOpen(false);
         router.push(`?${params.toString()}`);
-
-        };
+    };
 
     const handleClear = () => {
         const params = new URLSearchParams(searchParams.toString());
@@ -69,24 +68,25 @@ export default function BookFilters() {
     const activeFiltersCount = [currentCategory, currentCondition, currentStatus].filter(Boolean).length;
 
     return (
-        <div className="relative" ref={dropdownRef}>
-            <button
+        <div className="relative z-50" ref={dropdownRef}>
+            <button 
                 onClick={() => setIsOpen(!isOpen)}
-                className="shrink-0 px-6 py-3 bg-white/40"
+                className="shrink-0 h-[48px] px-6 bg-[#f2ece4]/60 hover:bg-white/80 text-[#5c6b4d] border border-[#a3b18a]/40 font-semibold rounded-full transition-all shadow-sm backdrop-blur-md flex items-center justify-center gap-2 relative"
             >
-            <span> Filters </span>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3"/>
-            </svg>
-            {activeFiltersCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#bc8a5f] text-white text-xs flex items-center justify-center rounded-full shadow-md">
-            {activeFiltersCount}
-                </span>
-            )}
+                <span>Filters</span>
+                <svg className="w-4 h-4 text-[#5c6b4d]" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+                
+                {activeFiltersCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#bc8a5f] text-white text-xs font-bold flex items-center justify-center rounded-full shadow-md">
+                        {activeFiltersCount}
+                    </span>
+                )}
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 top-full mt-3 w-72 bg-white/80 backdrop-blur-xl border border-white/60 shadow-xl shadow-stone-200/50 rounded-[1.5rem] p-5 z-50">
+                <div className="absolute right-0 top-full mt-3 w-72 bg-white/90 backdrop-blur-xl border border-white/60 shadow-xl shadow-stone-200/50 rounded-[1.5rem] p-5 z-50">
                 <form onSubmit={handleApply} className="flex flex-col gap-4">
                 
                 {/* Category Filter */}
@@ -111,10 +111,10 @@ export default function BookFilters() {
                     </select>
                 </div>
 
-                <div>
                 {/* Condition Filter */}    
+                <div>
                     <label className="block text-xs font-bold text-[#8a8a8a] uppercase tracking-wider mb-1">Condition</label>
-                    <select name="condition" defaultValue={currentCategory} className="w-full p-2.5 rounded-xl bg-white/50 border border-[#a3b18a]/30 text-[#4a4a4a] outline-none focus:border-[#bc8a5f] text-sm font-medium">
+                    <select name="condition" defaultValue={currentCondition} className="w-full p-2.5 rounded-xl bg-white/50 border border-[#a3b18a]/30 text-[#4a4a4a] outline-none focus:border-[#bc8a5f] text-sm font-medium">
                         <option value="">Any Condition</option>
                         <option value="new">New</option>
                         <option value="somewhat_new">Somewhat New</option>
@@ -124,10 +124,10 @@ export default function BookFilters() {
                     </select>
                 </div>
 
-                <div>
                 {/* Status Filter */}
+                <div>
                     <label className="block text-xs font-bold text-[#8a8a8a] uppercase tracking-wider mb-1">Status</label>
-                    <select name="status" defaultValue={currentCategory} className="w-full p-2.5 rounded-xl bg-white/50 border border-[#a3b18a]/30 text-[#4a4a4a] outline-none focus:border-[#bc8a5f] text-sm font-medium">
+                    <select name="status" defaultValue={currentStatus} className="w-full p-2.5 rounded-xl bg-white/50 border border-[#a3b18a]/30 text-[#4a4a4a] outline-none focus:border-[#bc8a5f] text-sm font-medium">
                         <option value="">Any Status</option>
                         <option value="AVAILABLE">Available</option>
                         <option value="BORROWED">Borrowed</option>
