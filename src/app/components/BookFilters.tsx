@@ -25,4 +25,122 @@ export default function BookFilters() {
             return () => document.removeEventListener("mousedown", handleClickOutside);
         }, []);
 
-}
+    const handleApply = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const category = formData.get("category") as string;
+        const condition = formData.get("condition") as string;
+        const status = formData.get("status") as string;
+
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (category) {
+            params.set("category", category);
+        } else {
+            params.delete("category");
+        }
+
+        if (condition) {
+            params.set("condition", condition);
+        } else {
+            params.delete("condition");
+        }
+       
+        if (status) {
+            params.set("status", status);
+        } else {
+            params.delete("status");
+        }
+
+        setIsOpen(false);
+        router.push(`?${params.toString()}`);
+
+        };
+
+    const handleClear = () => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("category");
+        params.delete("condition");
+        params.delete("status");
+        setIsOpen(false);
+        router.push(`?${params.toString()}`);
+    };
+
+    const activeFiltersCount = [currentCategory, currentCondition, currentStatus].filter(Boolean).length;
+
+    return (
+        <div className="relative" ref={dropdownRef}>
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="shrink-0 px-6 py-3 bg-white/40"
+            >
+            <span> Filters </span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3"/>
+            </svg>
+            {activeFiltersCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#bc8a5f] text-white text-xs flex items-center justify-center rounded-full shadow-md">
+            {activeFiltersCount}
+                </span>
+            )}
+            </button>
+
+            {isOpen && (
+                <div className="absolute right-0 top-full mt-3 w-72 bg-white/80 backdrop-blur-xl border border-white/60 shadow-xl shadow-stone-200/50 rounded-[1.5rem] p-5 z-50">
+                <form onSubmit={handleApply} className="flex flex-col gap-4">
+                
+                {/* Category Filter */}
+                <div>
+                    <label className="block text-xs font-bold text-[#8a8a8a] uppercase tracking-wider mb-1">Category</label>
+                    <select name="category" defaultValue={currentCategory} className="w-full p-2.5 rounded-xl bg-white/50 border border-[#a3b18a]/30 text-[#4a4a4a] outline-none focus:border-[#bc8a5f] text-sm font-medium">
+                        <option value="">All Categories</option>
+                        <option value="Fiction">Fiction</option>
+                        <option value="Non-Fiction">Non-Fiction</option>
+                        <option value="Textbook">Textbook</option>
+                        <option value="Sci-Fi">Sci-Fi</option>
+                        <option value="Fantasy">Fantasy</option>
+                        <option value="Mystery">Mystery</option>
+                        <option value="Romance">Romance</option>
+                        <option value="History">History</option>
+                        <option value="Biography">Biography</option>
+                        <option value="Science">Science</option>
+                    </select>
+                </div>
+
+                <div>
+                {/* Condition Filter */}    
+                    <label className="block text-xs font-bold text-[#8a8a8a] uppercase tracking-wider mb-1">Condition</label>
+                    <select name="category" defaultValue={currentCategory} className="w-full p-2.5 rounded-xl bg-white/50 border border-[#a3b18a]/30 text-[#4a4a4a] outline-none focus:border-[#bc8a5f] text-sm font-medium">
+                        <option value="">Any Conditions</option>
+                        <option value="New">NEW</option>
+                        <option value="Like New">SOMEWHAT NEW</option>
+                        <option value="Good">GOOD</option>
+                        <option value="Fair">FAIR</option>
+                        <option value="Poor">POOR</option>
+                    </select>
+                </div>
+
+                <div>
+                {/* Status Filter */}
+                    <label className="block text-xs font-bold text-[#8a8a8a] uppercase tracking-wider mb-1">Status</label>
+                    <select name="category" defaultValue={currentCategory} className="w-full p-2.5 rounded-xl bg-white/50 border border-[#a3b18a]/30 text-[#4a4a4a] outline-none focus:border-[#bc8a5f] text-sm font-medium">
+                        <option value="">Any Status</option>
+                        <option value="Available">AVAILABLE</option>
+                        <option value="Not Available">BORROWED</option>
+                    </select>
+                </div>
+
+                <div className="flex gap-2 mt-2">
+                    <button type="button" onClick={handleClear} className="flex-1 py-2 text-sm font-bold text-[#8a8a8a] hover:text-[#4a4a4a] transition-colors">
+                    Clear
+                    </button>
+                    <button type="submit" className="flex-1 py-2 bg-[#a3b18a] hover:bg-[#8da074] text-white text-sm font-bold rounded-full transition-all shadow-md shadow-[#a3b18a]/20">
+                    Apply
+                    </button>
+                </div>
+                </form>
+            </div>
+            )}
+        </div>
+    );
+};
