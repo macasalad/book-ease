@@ -110,23 +110,23 @@ export default function BookFilters() {
                 <div>
                 {/* Condition Filter */}    
                     <label className="block text-xs font-bold text-[#8a8a8a] uppercase tracking-wider mb-1">Condition</label>
-                    <select name="category" defaultValue={currentCategory} className="w-full p-2.5 rounded-xl bg-white/50 border border-[#a3b18a]/30 text-[#4a4a4a] outline-none focus:border-[#bc8a5f] text-sm font-medium">
-                        <option value="">Any Conditions</option>
-                        <option value="New">NEW</option>
-                        <option value="Like New">SOMEWHAT NEW</option>
-                        <option value="Good">GOOD</option>
-                        <option value="Fair">FAIR</option>
-                        <option value="Poor">POOR</option>
+                    <select name="condtion" defaultValue={currentCategory} className="w-full p-2.5 rounded-xl bg-white/50 border border-[#a3b18a]/30 text-[#4a4a4a] outline-none focus:border-[#bc8a5f] text-sm font-medium">
+                        <option value="">Any Condition</option>
+                        <option value="new">New</option>
+                        <option value="somewhat_new">Somewhat New</option>
+                        <option value="good">Good</option>
+                        <option value="fair">Fair</option>
+                        <option value="poor">Poor</option>
                     </select>
                 </div>
 
                 <div>
                 {/* Status Filter */}
                     <label className="block text-xs font-bold text-[#8a8a8a] uppercase tracking-wider mb-1">Status</label>
-                    <select name="category" defaultValue={currentCategory} className="w-full p-2.5 rounded-xl bg-white/50 border border-[#a3b18a]/30 text-[#4a4a4a] outline-none focus:border-[#bc8a5f] text-sm font-medium">
+                    <select name="status" defaultValue={currentCategory} className="w-full p-2.5 rounded-xl bg-white/50 border border-[#a3b18a]/30 text-[#4a4a4a] outline-none focus:border-[#bc8a5f] text-sm font-medium">
                         <option value="">Any Status</option>
-                        <option value="Available">AVAILABLE</option>
-                        <option value="Not Available">BORROWED</option>
+                        <option value="AVAILABLE">Available</option>
+                        <option value="BORROWED">Borrowd</option>
                     </select>
                 </div>
 
