@@ -98,6 +98,10 @@ export default function BookFilters() {
                         <option value="Non-Fiction">Non-Fiction</option>
                         <option value="Textbook">Textbook</option>
                         <option value="Sci-Fi">Sci-Fi</option>
+                        <option value="Action">Action</option>
+                        <option value="Thriller Action">Thriller Action</option>
+                        <option value="Horror">Horror</option>
+                        <option value="Adventure">Adventure</option>
                         <option value="Fantasy">Fantasy</option>
                         <option value="Mystery">Mystery</option>
                         <option value="Romance">Romance</option>
@@ -110,7 +114,7 @@ export default function BookFilters() {
                 <div>
                 {/* Condition Filter */}    
                     <label className="block text-xs font-bold text-[#8a8a8a] uppercase tracking-wider mb-1">Condition</label>
-                    <select name="condtion" defaultValue={currentCategory} className="w-full p-2.5 rounded-xl bg-white/50 border border-[#a3b18a]/30 text-[#4a4a4a] outline-none focus:border-[#bc8a5f] text-sm font-medium">
+                    <select name="condition" defaultValue={currentCategory} className="w-full p-2.5 rounded-xl bg-white/50 border border-[#a3b18a]/30 text-[#4a4a4a] outline-none focus:border-[#bc8a5f] text-sm font-medium">
                         <option value="">Any Condition</option>
                         <option value="new">New</option>
                         <option value="somewhat_new">Somewhat New</option>
@@ -126,7 +130,7 @@ export default function BookFilters() {
                     <select name="status" defaultValue={currentCategory} className="w-full p-2.5 rounded-xl bg-white/50 border border-[#a3b18a]/30 text-[#4a4a4a] outline-none focus:border-[#bc8a5f] text-sm font-medium">
                         <option value="">Any Status</option>
                         <option value="AVAILABLE">Available</option>
-                        <option value="BORROWED">Borrowd</option>
+                        <option value="BORROWED">Borrowed</option>
                     </select>
                 </div>
 
