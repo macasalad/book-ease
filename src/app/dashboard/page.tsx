@@ -4,6 +4,7 @@ import { SignOutButton } from "../components/SignOutButton";
 import { auth } from "../../../auth";
 import { headers } from "next/headers";
 import BookSearchBar from "../components/BookSearchBar";
+import BookFilters from "../components/BookFilters";
 
 type Listing = {
   id: string;
@@ -17,7 +18,7 @@ type Listing = {
 export default async function Dashboard({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string }>;
+  searchParams: Promise<{ search?: string; category?: string; condition?: string; status?: string }>;
 }) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
