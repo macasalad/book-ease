@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../../../../auth";
 import { SignOutButton } from "../../components/SignOutButton";
+import PollingConversation from "./PollingConversation";
 
 const prisma = new PrismaClient();
 
@@ -43,6 +44,7 @@ export default async function ConversationPage({
       participants: {
         select: {
           userId: true,
+          lastReadAt: true,
           user: {
             select: {
               id: true,
@@ -223,70 +225,13 @@ export default async function ConversationPage({
           </div>
 
           <div className="px-6 py-6 bg-white/20">
-            <div className="rounded-[1.5rem] border border-white/60 bg-white/30 backdrop-blur-md p-4 md:p-6 min-h-[420px] max-h-[520px] overflow-y-auto shadow-inner">
-              {safeConversation.messages.length === 0 ? (
-                <div className="h-full min-h-[360px] flex flex-col items-center justify-center text-center">
-                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#a3b18a]/20 text-3xl">
-                    💬
-                  </div>
-                  <p className="text-lg font-semibold text-[#4a4a4a]">
-                    No messages yet
-                  </p>
-                  <p className="mt-2 text-sm text-[#8a8a8a] max-w-md">
-                    Start the conversation about borrowing arrangements here.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {safeConversation.messages.map((message) => {
-                    const isMine = message.senderId === currentUserId;
-
-                    return (
-                      <div
-                        key={message.id}
-                        className={`flex ${isMine ? "justify-end" : "justify-start"}`}
-                      >
-                        <div
-                          className={`max-w-[78%] px-4 py-3 shadow-sm ${
-                            isMine
-                              ? "bg-[#bc8a5f] text-white rounded-[1.5rem] rounded-br-md"
-                              : "bg-white/70 text-[#4a4a4a] border border-white/60 rounded-[1.5rem] rounded-bl-md"
-                          }`}
-                        >
-                          <p className="whitespace-pre-wrap break-words text-sm md:text-[15px] leading-relaxed">
-                            {message.content}
-                          </p>
-                          <p
-                            className={`mt-2 text-[11px] ${
-                              isMine ? "text-white/80" : "text-[#8a8a8a]"
-                            }`}
-                          >
-                            {new Date(message.createdAt).toLocaleString()}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            <form action={sendMessage} className="mt-5 flex flex-col gap-4">
-              <textarea
-                name="content"
-                placeholder="Type your message..."
-                className="w-full rounded-[1.5rem] border border-white/60 bg-white/50 px-5 py-4 text-[#4a4a4a] placeholder:text-[#8a8a8a] outline-none focus:border-[#bc8a5f]/50 focus:ring-2 focus:ring-[#bc8a5f]/20 backdrop-blur-md min-h-[110px] resize-none"
-              />
-
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  className="px-6 py-3 bg-[#bc8a5f] hover:bg-[#a47148] text-white font-bold rounded-full transition-all shadow-lg shadow-[#bc8a5f]/20"
-                >
-                  Send message
-                </button>
-              </div>
-            </form>
+            <PollingConversation
+              currentUserId={currentUserId}
+              conversationId={conversationId}
+              initialMessages={safeConversation.messages}
+              initialOtherUserLastReadAt={otherParticipant?.lastReadAt?.toISOString() ?? null}
+              sendMessage={sendMessage}
+            />
           </div>
         </div>
       </div>
