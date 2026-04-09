@@ -4,6 +4,7 @@ import { SignOutButton } from "../components/SignOutButton";
 import { auth } from "../../../auth";
 import { headers } from "next/headers";
 import BookSearchBar from "../components/BookSearchBar";
+import BookFilters from "../components/BookFilters";
 
 type Listing = {
   id: string;
@@ -17,18 +18,26 @@ type Listing = {
 export default async function Dashboard({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string }>;
+  searchParams: Promise<{ search?: string; category?: string; condition?: string; status?: string }>;
 }) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
 
-  const { search } = await searchParams;
-  const trimmedSearch = search?.trim() ?? "";
+  const resolvedParams = await searchParams; // Await searchParams once
+  const trimmedSearch = resolvedParams.search?.trim() ?? "";
 
   const baseUrl = "http://localhost:3000";
 
-  const endpoint = trimmedSearch
-    ? `${baseUrl}/api/book_listing?search=${encodeURIComponent(trimmedSearch)}`
+  const queryParams = new URLSearchParams();
+  if (trimmedSearch) queryParams.set("search", trimmedSearch);
+  if (resolvedParams.category) queryParams.set("category", resolvedParams.category);
+  if (resolvedParams.condition) queryParams.set("condition", resolvedParams.condition);
+  if (resolvedParams.status) queryParams.set("status", resolvedParams.status);
+
+  // If there are params, append them. Otherwise, use base URL.
+  const queryString = queryParams.toString();
+  const endpoint = queryString
+    ? `${baseUrl}/api/book_listing?${queryString}`
     : `${baseUrl}/api/book_listing`;
 
   const res = await fetch(endpoint, {
@@ -36,6 +45,9 @@ export default async function Dashboard({
   });
 
   const data = (await res.json()) as { items: Listing[] };
+
+  // Determine if ANY filters or search are active
+  const hasActiveFilters = Boolean(trimmedSearch || resolvedParams.category || resolvedParams.condition || resolvedParams.status);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] overflow-x-hidden relative font-sans">
@@ -83,23 +95,17 @@ export default async function Dashboard({
             <div className="flex-1 md:w-80 font-inherit">
               <BookSearchBar initialQuery={trimmedSearch} />
             </div>
-
-            <button className="shrink-0 px-6 py-3 bg-white/40 hover:bg-white/60 text-[#5a7d5a] border border-[#a3b18a]/30 font-bold rounded-full transition-all shadow-sm backdrop-blur-md flex items-center gap-2">
-              <span>Filters</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
-            </button>
+            <BookFilters />
           </div>
         </div>
 
-        {trimmedSearch && (
+        {hasActiveFilters && (
           <div className="mb-8 flex items-center gap-3">
             <Link
               href="/dashboard"
               className="inline-flex items-center rounded-full border border-[#a3b18a]/30 bg-white/50 px-4 py-2 text-sm font-medium text-[#5a7d5a] hover:bg-white/70 transition-all"
             >
-              Clear search
+              Clear filters
             </Link>
             <span className="text-sm text-[#8a8a8a]">
               {data.items.length} result{data.items.length === 1 ? "" : "s"} found
@@ -158,13 +164,14 @@ export default async function Dashboard({
           ))}
         </div>
 
-        {trimmedSearch && data.items.length === 0 && (
+        {/* Updated empty state text to reflect filters */}
+        {hasActiveFilters && data.items.length === 0 && (
           <div className="mt-12 rounded-[1.5rem] border border-white/60 bg-white/40 p-8 text-center backdrop-blur-md shadow-lg shadow-stone-200/30">
             <p className="text-lg font-semibold text-[#4a4a4a]">
-              No books found for "{trimmedSearch}"
+              No books found matching your criteria.
             </p>
             <p className="mt-2 text-sm text-[#8a8a8a]">
-              Try a different title or author.
+              Try adjusting your search or clearing your filters.
             </p>
           </div>
         )}
