@@ -69,6 +69,9 @@ export async function POST(
           error: "Book is no longer available" 
         }, { status: 400 });
       }
+
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 7);
       
       await prisma.$transaction([
         prisma.borrowRequest.update({ 
@@ -82,7 +85,8 @@ export async function POST(
         prisma.borrowRecord.create({ 
           data: { 
             borrowerId: borrowRequest.borrowerId, 
-            bookId: borrowRequest.bookId 
+            bookId: borrowRequest.bookId,
+            dueAt: dueDate
           } 
         }),
       ]);

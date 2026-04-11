@@ -136,7 +136,10 @@ export default function PollingConversation({
                         isMine ? "text-white/80" : "text-[#8a8a8a]"
                       }`}
                     >
-                      {new Date(message.createdAt).toLocaleString()}
+                      {new Date(message.createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </p>
                   </div>
 

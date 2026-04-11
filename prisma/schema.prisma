@@ -157,7 +157,10 @@ model BorrowRecord {
   borrower   User   @relation(fields: [borrowerId], references: [id])
 
   borrowedAt DateTime  @default(now())
+  dueAt      DateTime?
   returnedAt DateTime?
+
+  extended   Boolean   @default(false)
 }
 
 model Conversation {

@@ -25,6 +25,8 @@ export default async function BorrowingPage() {
     select: {
       id: true,
       borrowedAt: true,
+      dueAt: true,
+      extended: true,
       book: { 
         select: { 
           id: true, 
@@ -55,6 +57,7 @@ export default async function BorrowingPage() {
     select: {
       id: true,
       borrowedAt: true,
+      dueAt: true,
       returnedAt: true,
       book: { 
         select: { 

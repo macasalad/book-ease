@@ -78,6 +78,8 @@ export default async function MessagesPage() {
         unread,
       };
     });
+  
+    const unreadCount = inbox.filter((c) => c.unread).length;
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] overflow-x-hidden relative font-sans">
@@ -99,11 +101,13 @@ export default async function MessagesPage() {
             <Link href="/lending" className="hover:text-[#bc8a5f] transition-colors">
               Lending
             </Link>
-            <Link
-              href="/messages"
-              className="text-[#4a4a4a] font-bold relative after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-0.5 after:bg-[#bc8a5f] after:rounded-full"
-            >
+            <Link href="/messages" className="relative text-[#4a4a4a] font-bold after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-0.5 after:bg-[#bc8a5f] after:rounded-full">
               Messages
+            {unreadCount > 0 && (
+              <span className="absolute -top-2 -right-5 min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[10px] font-bold text-white bg-[#7D1128] rounded-full">
+                {unreadCount}
+              </span>
+            )}
             </Link>
           </div>
 
@@ -214,7 +218,10 @@ export default async function MessagesPage() {
 
                     <div className="shrink-0 text-right">
                       <p className="text-xs text-[#8a8a8a]">
-                        {new Date(conversation.updatedAt).toLocaleString()}
+                        {new Date(conversation.updatedAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </p>
                     </div>
                   </div>
