@@ -55,35 +55,6 @@ export default async function UserProfile({ params }: ProfileProps) {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] overflow-x-hidden relative font-sans">
-      {/* Top Navigation Bar */}
-      <nav className="sticky top-0 z-50 w-full border-b border-[#a3b18a]/20 bg-white/20 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-[15px] font-medium">
-          {/* Navigation Links */}
-          <div className="flex space-x-10 text-[#8a8a8a]">
-            <Link href="/dashboard" className="hover:text-[#bc8a5f] transition-colors">Home</Link>
-            <Link href="/listing" className="hover:text-[#bc8a5f] transition-colors">Listing</Link>
-            <Link href="/catalog" className="hover:text-[#bc8a5f] transition-colors">Catalog</Link>
-            <Link href="/borrowing" className="hover:text-[#bc8a5f] transition-colors">Borrowing</Link>
-            <Link href="/lending" className="hover:text-[#bc8a5f] transition-colors">Lending</Link>
-            <Link href="/messages" className="hover:text-[#bc8a5f] transition-colors">Messages</Link>
-          </div>
-
-          {/* User Actions */}
-          <div className="flex space-x-8 items-center">
-            <Link 
-              href="/profile" 
-              className="text-[#4a4a4a] font-bold relative after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-0.5 after:bg-[#bc8a5f] after:rounded-full"
-            >
-              My Account
-            </Link>
-            {isOwnProfile && (
-              <div className="opacity-80 hover:opacity-100 transition-opacity">
-                <SignOutButton />
-              </div>
-            )}
-          </div>
-        </div>
-      </nav>
 
       {/* Background Decorative Circles */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-[#a3b18a]/20 rounded-full blur-[120px] pointer-events-none" />
