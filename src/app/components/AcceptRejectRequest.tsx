@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 export default function AcceptRejectRequest({
   request,
@@ -10,7 +11,13 @@ export default function AcceptRejectRequest({
     status: "PENDING" | "APPROVED" | "REJECTED";
     createdAt: Date;
     returnDate?: Date | null; // Add returnDate at the root level
-    borrower: { id: string; name: string; email: string };
+    borrower: {
+      id: string;
+      name: string;
+      email: string;
+      image?: string | null;
+      customImage?: string | null;
+    };
     book: { id: string; title: string; photos: string[] }; // Remove return from here
   };
 }) {
@@ -60,9 +67,28 @@ export default function AcceptRejectRequest({
         <h2 className="text-lg font-bold text-[#4a4a4a] leading-tight">{request.book.title}</h2>
         
         <div className="mt-2 space-y-0.5">
-          <p className="text-sm text-[#5c5c5c]">
-            <span className="font-semibold text-[#8a8a8a]">Borrower:</span> {request.borrower.name}
-          </p>
+        <div className="flex items-center gap-2">
+  <span className="font-semibold text-[#8a8a8a]">Borrowed by:</span>
+
+  <Link
+    href={`/profile/${request.borrower.id}`}
+    className="flex items-center gap-2 hover:text-[#bc8a5f] transition-colors"
+  >
+    <img
+      src={
+        request.borrower.customImage ||
+        request.borrower.image ||
+        "/default-avatar.png"
+      }
+      className="w-6 h-6 rounded-full object-cover border border-white/60"
+      alt={request.borrower.name}
+    />
+
+    <span className="text-sm font-medium text-[#4a4a4a]">
+      {request.borrower.name}
+    </span>
+  </Link>
+</div>
           <p className="text-xs text-[#8a8a8a]">
             <span className="font-semibold">Requested:</span> {new Date(request.createdAt).toLocaleDateString()}
           </p>
