@@ -80,7 +80,7 @@ export default function AcceptRejectRequest({
                 ? "bg-[#bc8a5f]/10 text-[#bc8a5f] border-[#bc8a5f]/20"
                 : status === "APPROVED"
                 ? "bg-[#a3b18a]/20 text-[#5a7d5a] border-[#a3b18a]/30"
-                : "bg-red-50 text-red-400 border-red-100"
+                : "bg-[#7D1128]/10 text-[#7D1128] border-[#7D1128]/30"
             }`}
           >
             {status}

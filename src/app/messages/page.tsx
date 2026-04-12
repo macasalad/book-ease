@@ -78,48 +78,11 @@ export default async function MessagesPage() {
         unread,
       };
     });
+  
+    const unreadCount = inbox.filter((c) => c.unread).length;
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] overflow-x-hidden relative font-sans">
-      <nav className="sticky top-0 z-50 w-full border-b border-[#a3b18a]/20 bg-white/20 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-[15px] font-medium">
-          <div className="flex space-x-10 text-[#8a8a8a]">
-            <Link href="/dashboard" className="hover:text-[#bc8a5f] transition-colors">
-              Home
-            </Link>
-            <Link href="/listing" className="hover:text-[#bc8a5f] transition-colors">
-              Listing
-            </Link>
-            <Link href="/catalog" className="hover:text-[#bc8a5f] transition-colors">
-              Catalog
-            </Link>
-            <Link href="/borrowing" className="hover:text-[#bc8a5f] transition-colors">
-              Borrowing
-            </Link>
-            <Link href="/lending" className="hover:text-[#bc8a5f] transition-colors">
-              Lending
-            </Link>
-            <Link
-              href="/messages"
-              className="text-[#4a4a4a] font-bold relative after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-0.5 after:bg-[#bc8a5f] after:rounded-full"
-            >
-              Messages
-            </Link>
-          </div>
-
-          <div className="flex space-x-8 items-center">
-            <Link
-              href="/profile"
-              className="hover:text-[#bc8a5f] transition-colors font-bold"
-            >
-              My Account
-            </Link>
-            <div className="opacity-80 hover:opacity-100 transition-opacity">
-              <SignOutButton />
-            </div>
-          </div>
-        </div>
-      </nav>
 
       <div className="absolute top-40 left-10 w-72 h-72 bg-[#a3b18a]/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#bc8a5f]/10 rounded-full blur-[120px] pointer-events-none" />
@@ -214,7 +177,10 @@ export default async function MessagesPage() {
 
                     <div className="shrink-0 text-right">
                       <p className="text-xs text-[#8a8a8a]">
-                        {new Date(conversation.updatedAt).toLocaleString()}
+                        {new Date(conversation.updatedAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </p>
                     </div>
                   </div>
