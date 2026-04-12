@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -14,18 +14,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
 
-  @@unique([email])
+enum BookStatus {
+  AVAILABLE
+  BORROWED
+}
+
+model User {
+  id            String  @id
+  name          String
+  email         String  @unique
+  emailVerified Boolean @default(false)
+  image         String?
+  customImage   String?
+  bio           String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions Session[]
+  accounts Account[]
+
+  // Books owned by the user
+  bookListings BookListing[]
+
+  // Borrow requests
+  borrowRequestsSent     BorrowRequest[] @relation("BorrowerRequests")
+  borrowRequestsReceived BorrowRequest[] @relation("LenderRequests")
+
+  // Borrow history
+  borrowRecords BorrowRecord[]
+
+  // Message history
+  conversationParticipants ConversationParticipant[]
+  sentMessages             Message[]
+
   @@map("user")
 }
 
@@ -75,4 +103,93 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model BookListing {
+  id          String   @id @default(cuid())
+  title       String
+  author      String
+  category    String
+  condition   String
+  isbn        String
+  description String?
+  photos      String[] @db.VarChar(500)
+
+  status BookStatus @default(AVAILABLE)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  borrowRequests BorrowRequest[]
+  borrowRecords  BorrowRecord[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BorrowRequest {
+  id String @id @default(cuid())
+
+  status RequestStatus @default(PENDING)
+
+  borrowerId String
+  borrower   User   @relation("BorrowerRequests", fields: [borrowerId], references: [id])
+
+  lenderId String
+  lender   User   @relation("LenderRequests", fields: [lenderId], references: [id])
+
+  bookId String
+  book   BookListing @relation(fields: [bookId], references: [id])
+
+  borrowDate DateTime?
+  returnDate DateTime?
+
+  createdAt DateTime @default(now())
+}
+
+model BorrowRecord {
+  id String @id @default(cuid())
+
+  bookId String
+  book   BookListing @relation(fields: [bookId], references: [id])
+
+  borrowerId String
+  borrower   User   @relation(fields: [borrowerId], references: [id])
+
+  borrowedAt DateTime  @default(now())
+  dueAt      DateTime?
+  returnedAt DateTime?
+
+  extended   Boolean   @default(false)
+}
+
+model Conversation {
+  id           String                    @id @default(cuid())
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  id             String    @id @default(cuid())
+  conversationId String
+  userId         String
+  lastReadAt     DateTime?
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
 }
