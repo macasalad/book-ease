@@ -160,30 +160,45 @@ export default async function ConversationPage({
         </div>
 
         <div className="rounded-[2rem] border border-white/60 bg-white/40 backdrop-blur-lg shadow-xl shadow-stone-200/50 overflow-hidden">
-          <div className="flex items-center gap-4 border-b border-[#a3b18a]/20 px-6 py-5 bg-white/30">
-            <div className="h-14 w-14 overflow-hidden rounded-full border border-white/60 bg-[#e2d9c8]/50 shadow-sm flex items-center justify-center text-[#8a8a8a] font-bold">
-              {otherParticipant?.user.customImage || otherParticipant?.user.image ? (
-                <img
-                  src={otherParticipant?.user.customImage || otherParticipant?.user.image || ""}
-                  alt={otherParticipant?.user.name ?? "User"}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span>
-                  {(otherParticipant?.user.name ?? "U").charAt(0).toUpperCase()}
-                </span>
-              )}
-            </div>
+        <div className="flex items-center gap-4 border-b border-[#a3b18a]/20 px-6 py-5 bg-white/30">
 
-            <div>
-              <h1 className="text-2xl font-bold text-[#4a4a4a]">
-                {otherParticipant?.user.name ?? "Conversation"}
-              </h1>
-              <p className="text-sm text-[#8a8a8a] font-medium">
-                Coordinate borrowing details here
-              </p>
-            </div>
-          </div>
+        {/* Profile Picture + Link */}
+        <Link
+          href={`/profile/${otherParticipant?.user.id}`}
+          className="h-14 w-14 overflow-hidden rounded-full border border-white/60 bg-[#e2d9c8]/50 shadow-sm flex items-center justify-center text-[#8a8a8a] font-bold hover:opacity-80 transition"
+        >
+          {otherParticipant?.user.customImage || otherParticipant?.user.image ? (
+            <img
+              src={
+                otherParticipant?.user.customImage ||
+                otherParticipant?.user.image ||
+                ""
+              }
+              alt={otherParticipant?.user.name ?? "User"}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <span>
+              {(otherParticipant?.user.name ?? "U").charAt(0).toUpperCase()}
+            </span>
+          )}
+        </Link>
+
+        {/* Name + Info (also clickable) */}
+        <div>
+          <Link
+            href={`/profile/${otherParticipant?.user.id}`}
+            className="text-2xl font-bold text-[#4a4a4a] hover:text-[#bc8a5f] transition-colors"
+          >
+            {otherParticipant?.user.name ?? "Conversation"}
+          </Link>
+
+          <p className="text-sm text-[#8a8a8a] font-medium">
+            Coordinate borrowing details here
+          </p>
+        </div>
+
+        </div>
 
           <div className="px-6 py-6 bg-white/20">
             <PollingConversation

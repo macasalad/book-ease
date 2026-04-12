@@ -22,8 +22,30 @@ export default async function LendingPage() {
       status: true,
       createdAt: true,
       returnDate: true,
-      borrower: { select: { id: true, name: true, email: true } },
-      book: { select: { id: true, title: true, photos: true } },
+      borrower: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          customImage: true,
+        }
+      },
+      book: {
+        select: {
+          id: true,
+          title: true,
+          photos: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              customImage: true,
+            }
+          }
+        }
+      }
     },
   });
 

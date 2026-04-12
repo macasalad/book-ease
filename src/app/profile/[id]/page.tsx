@@ -111,6 +111,29 @@ export default async function UserProfile({ params }: ProfileProps) {
                   </Link>
                 </div>
               )}
+
+              {/* See other users' listings */}
+              {!isOwnProfile && (
+                <div className="flex gap-4 pt-2">
+                  <Link
+                    href={`/profile/${profileUser.id}/listings`}
+                    className="px-8 py-2.5 bg-[#a3b18a] hover:bg-[#8fa17a] text-white font-bold rounded-full transition-all shadow-lg shadow-[#a3b18a]/20 active:scale-95"
+                  >
+                    See {profileUser.name || "User"}'s Listings
+                  </Link>
+                </div>
+              )}
+
+              {/* Send Message */}
+              {!isOwnProfile && (
+                <Link
+                href={`/messages/cmnty7ffp0000vp8gdr50xd9b`}
+                className="px-8 py-2.5 bg-[#bc8a5f] hover:bg-[#a47148] text-white font-bold rounded-full transition-all shadow-lg shadow-[#bc8a5f]/20 active:scale-95"
+              >
+                Send Message
+              </Link>
+              )}
+              
             </div>
           </div>
         </section>

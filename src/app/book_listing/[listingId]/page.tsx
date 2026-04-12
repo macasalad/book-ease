@@ -232,6 +232,28 @@ export default async function BookDetailPage({
                         {safeListing.createdAt.toLocaleDateString()}
                       </span>
                     </div>
+                    <div className="grid grid-cols-3 gap-2 items-center">
+                      <span className="text-[#8a8a8a] font-medium">Posted by:</span>
+
+                      <div className="col-span-2 flex items-center gap-3">
+                        <img
+                          src={
+                            safeListing.user.customImage ||
+                            safeListing.user.image ||
+                            "/default-avatar.png"
+                          }
+                          alt={safeListing.user.name || "User"}
+                          className="w-8 h-8 rounded-full object-cover border border-white/60"
+                        />
+
+                        <Link
+                          href={`/profile/${safeListing.user.id}`}
+                          className="font-semibold text-[#4a4a4a] hover:text-[#bc8a5f] transition-colors"
+                        >
+                          {safeListing.user.name || "Anonymous User"}
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
