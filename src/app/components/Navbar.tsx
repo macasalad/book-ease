@@ -3,25 +3,24 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { SignOutButton } from "@/components/SignOutButton";
+import { authClient } from "@/lib/auth-client";
 
 export default function Navbar() {
+  const { data: session, isPending } = authClient.useSession();
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    let active = true;
+    if (!session) return;
 
+    let active = true;
     const fetchUnreadCount = async () => {
       try {
         const res = await fetch("/api/messages/unread-count", {
           cache: "no-store",
         });
-
         if (!res.ok) return;
-
         const data = await res.json();
-
         if (!active) return;
-
         setUnreadCount(data.unreadCount || 0);
       } catch {
         // ignore errors
@@ -35,12 +34,16 @@ export default function Navbar() {
       active = false;
       clearInterval(interval);
     };
-  }, []);
+  }, [session]);
+
+  if (isPending || !session) {
+    return null;
+  }
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-[#a3b18a]/20 bg-white/20 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-[15px] font-medium">
-          <div className="flex space-x-10 text-[#8a8a8a]">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-[15px] font-medium">
+        <div className="flex space-x-10 text-[#8a8a8a]">
           <Link href="/dashboard" className="hover:text-[#bc8a5f] transition-colors">
             Home
           </Link>
