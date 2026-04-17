@@ -111,7 +111,7 @@ model BookListing {
   author      String
   category    String
   condition   String
-  isbn        String
+  isbn        String?
   description String?
   photos      String[] @db.VarChar(500)
 
