@@ -47,7 +47,7 @@ export default function Navbar() {
           <Link href="/dashboard" className="hover:text-[#bc8a5f] transition-colors">
             Home
           </Link>
-          <Link href="/listing" className="hover:text-[#bc8a5f] transition-colors">
+          <Link href="/book_listing" className="hover:text-[#bc8a5f] transition-colors">
             Listing
           </Link>
           <Link href="/catalog" className="hover:text-[#bc8a5f] transition-colors">
