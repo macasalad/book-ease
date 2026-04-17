@@ -2,12 +2,18 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation"; 
 import { SignOutButton } from "@/components/SignOutButton";
 import { authClient } from "@/lib/auth-client";
 
 export default function Navbar() {
   const { data: session, isPending } = authClient.useSession();
   const [unreadCount, setUnreadCount] = useState(0);
+  
+  const pathname = usePathname(); 
+
+  const hiddenRoutes = ["/sign-in", "/sign-up"];
+  const isHiddenRoute = hiddenRoutes.includes(pathname);
 
   useEffect(() => {
     if (!session) return;
@@ -36,7 +42,7 @@ export default function Navbar() {
     };
   }, [session]);
 
-  if (isPending || !session) {
+  if (isHiddenRoute || isPending || !session) {
     return null;
   }
 
