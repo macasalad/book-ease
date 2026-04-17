@@ -88,6 +88,7 @@ export async function GET(request: Request) {
   const category = searchParams.get("category");
   const condition = searchParams.get("condition");
   const status = searchParams.get("status");
+  const excludeUserId = searchParams.get("exclude");
 
   // Build the dynamic 'where' object for Prisma
   const where: any = {};
@@ -112,7 +113,7 @@ export async function GET(request: Request) {
   }
 
   const items = await prisma.bookListing.findMany({
-    where, // Apply the filters here
+    where: {...(excludeUserId ? { userId: { not: excludeUserId } } : {}),}, // Apply the filters here
     orderBy: { createdAt: "desc" },
     select: {
       id: true,

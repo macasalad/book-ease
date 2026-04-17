@@ -5,6 +5,7 @@ import { auth } from "../../../auth";
 import { headers } from "next/headers";
 import BookSearchBar from "../components/BookSearchBar";
 import BookFilters from "../components/BookFilters";
+import { prisma } from "@/lib/prisma";
 
 type Listing = {
   id: string;
@@ -23,12 +24,22 @@ export default async function Dashboard({
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
 
+  let loggedInUserId: string | null = null;
+  if (session?.user?.email) {
+    const userRecord = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    });
+    loggedInUserId = userRecord?.id || null;
+  }
+
   const resolvedParams = await searchParams; // Await searchParams once
   const trimmedSearch = resolvedParams.search?.trim() ?? "";
 
   const baseUrl = "http://localhost:3000";
 
   const queryParams = new URLSearchParams();
+  if (loggedInUserId) queryParams.set("exclude", loggedInUserId);
   if (trimmedSearch) queryParams.set("search", trimmedSearch);
   if (resolvedParams.category) queryParams.set("category", resolvedParams.category);
   if (resolvedParams.condition) queryParams.set("condition", resolvedParams.condition);
