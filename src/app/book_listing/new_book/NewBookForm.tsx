@@ -101,8 +101,7 @@ export default function NewBookForm() {
       form.title.trim() &&
       form.author.trim() &&
       form.category.trim() &&
-      form.condition.trim() &&
-      form.isbn.trim();
+      form.condition.trim();
 
     const photosOk = form.photos.length >= 1;
     return Boolean(requiredTextOk && photosOk);
@@ -340,7 +339,7 @@ export default function NewBookForm() {
     <form onSubmit={onSubmit} className="flex flex-col space-y-6">
       <div className="p-5 bg-white/30 rounded-2xl border border-white/50 mb-4">
         <label className="text-[#8a8a8a] text-sm font-semibold uppercase tracking-wider block mb-2">
-          Search by ISBN or by book Title
+          Search by ISBN or book title (optional)
         </label>
 
         <div ref={searchBoxRef} className="relative">

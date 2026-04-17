@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   const photoUrls: string[] = [];
 
   // required fields (everything except description)
-  if (!title || !author || !category || !condition || !isbn) {
+  if (!title || !author || !category || !condition) {
     return NextResponse.json(
       { error: "Missing required fields." },
       { status: 400 }
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
       author,
       category,
       condition,
-      isbn,
+      isbn: isbn || null,
       description: description || null,
       photos: photoUrls,
     },
