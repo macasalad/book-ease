@@ -7,8 +7,12 @@ export const SignOutButton = () => {
   const router = useRouter()
  
   const handleSignOut = async () => {
+
     await authClient.signOut()
-    router.refresh()
+
+    router.push('/sign-in')
+    
+    router.refresh() 
   }
  
   return (
