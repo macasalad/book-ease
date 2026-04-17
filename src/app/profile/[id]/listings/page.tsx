@@ -3,9 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { SignOutButton } from "../../../components/SignOutButton";
 import { BookListing } from "@prisma/client";
-import Navbar from "@/app/components/Navbar";
 
 export const dynamic = 'force-dynamic';
 
