@@ -79,9 +79,7 @@ export default async function UserListings({ params }: ListingsProps) {
         {/* Header Section */}
         <div className="flex justify-between items-end mb-10 border-b border-[#a3b18a]/30 pb-6">
           <div>
-            <Link href={`/profile/${profileUser.id}`} className="text-[#a3b18a] hover:text-[#bc8a5f] text-sm font-semibold tracking-wide flex items-center gap-2 mb-2 transition-colors">
-              &larr; Back to Profile
-            </Link>
+
             <h1 className="text-4xl font-bold tracking-tight text-[#4a4a4a]">
               {isOwnListings ? "My Book Listings" : `${profileUser.name || "User"}'s Listings`}
             </h1>
