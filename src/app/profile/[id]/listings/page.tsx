@@ -66,6 +66,8 @@ export default async function UserListings({ params }: ListingsProps) {
   const data = (await res.json()) as { items: Listing[] };
   const userListings = data?.items || [];
 
+  const availableCount = userListings.filter((book) => !book.isBorrowed).length;
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] overflow-x-hidden relative font-sans">
       {/* Background Decorative Circles */}
@@ -84,7 +86,7 @@ export default async function UserListings({ params }: ListingsProps) {
               {isOwnListings ? "My Book Listings" : `${profileUser.name || "User"}'s Listings`}
             </h1>
             <p className="text-[#8a8a8a] mt-2">
-              {userListings.length} {userListings.length === 1 ? 'book' : 'books'} available
+            {availableCount} {availableCount === 1 ? 'book' : 'books'} available
             </p>
           </div>
 
