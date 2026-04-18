@@ -96,7 +96,16 @@ export default async function UserProfile({ params }: ProfileProps) {
               <div className="space-y-1">
                 <label className="text-[#8a8a8a] text-sm font-semibold uppercase tracking-wider">Bio</label>
                 <div className="w-full min-h-[120px] p-5 bg-white/50 border border-[#a3b18a]/30 rounded-2xl text-[#5c5c5c] leading-relaxed italic">
-                  {profileUser.bio || "No bio yet. Share a bit about your reading journey!"}
+                  {profileUser.bio ? (
+                    // Show actual bio if it exists
+                    profileUser.bio
+                  ) : isOwnProfile ? (
+                    // Show prompt if empty AND it's the user's own profile
+                    "No bio yet. Share a bit about your reading journey!"
+                  ) : (
+                    // Show "No bio" message for visitors viewing an empty profile
+                    "This user hasn't added a bio yet."
+                  )}
                 </div>
               </div>
 
