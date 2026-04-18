@@ -5,6 +5,77 @@ import { auth } from "@/auth";
 
 const prisma = new PrismaClient();
 
+type MessageItem =
+  | {
+      type: "divider";
+      id: string;
+      label: string;
+      date: string;
+    }
+  | {
+      type: "message";
+      id: string;
+      content: string;
+      createdAt: string;
+      senderId: string;
+    };
+
+function formatDividerLabel(date: Date) {
+  const now = new Date();
+  const sameYear = date.getFullYear() === now.getFullYear();
+
+  const base = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+  }).format(date);
+
+  if (sameYear) return base;
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+}
+
+function buildMessageItems(
+  messages: Array<{
+    id: string;
+    content: string;
+    createdAt: Date;
+    senderId: string;
+  }>
+): MessageItem[] {
+  const items: MessageItem[] = [];
+
+  for (let i = 0; i < messages.length; i++) {
+    const current = messages[i];
+    const prev = i > 0 ? messages[i - 1] : null;
+
+    const currentDay = current.createdAt.toDateString();
+    const prevDay = prev ? prev.createdAt.toDateString() : null;
+
+    if (!prev || currentDay !== prevDay) {
+      items.push({
+        type: "divider",
+        id: `divider-${current.createdAt.toISOString()}`,
+        label: formatDividerLabel(current.createdAt),
+        date: current.createdAt.toISOString(),
+      });
+    }
+
+    items.push({
+      type: "message",
+      id: current.id,
+      content: current.content,
+      createdAt: current.createdAt.toISOString(),
+      senderId: current.senderId,
+    });
+  }
+
+  return items;
+}
+
 export async function GET(
   req: Request,
   context: { params: Promise<{ conversationId: string }> }
@@ -63,8 +134,10 @@ export async function GET(
     (participant) => participant.userId !== session.user.id
   );
 
+  const items = buildMessageItems(conversation.messages);
+
   return NextResponse.json({
-    messages: conversation.messages,
+    messages: items,
     otherUserLastReadAt: otherParticipant?.lastReadAt?.toISOString() ?? null,
   });
 }
