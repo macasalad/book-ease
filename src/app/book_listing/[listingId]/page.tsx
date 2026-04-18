@@ -21,7 +21,6 @@ export default async function BookDetailPage({
     redirect("/dashboard");
   }
 
-  // fetch single book listing
   const listing = await prisma.bookListing.findUnique({
     where: { id: listingId },
     select: {
@@ -133,12 +132,10 @@ export default async function BookDetailPage({
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] overflow-x-hidden relative font-sans p-6 md:p-10">
-      {/* Background Decorative Circles */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-[#a3b18a]/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#bc8a5f]/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="mx-auto max-w-7xl relative z-10">
-        {/* Back Link */}
         <div className="mb-4 ml-2">
           <Link
             href="/dashboard"
@@ -156,14 +153,12 @@ export default async function BookDetailPage({
           </Link>
         </div>
 
-        {/* Main Glass Container */}
         <div className="w-full p-6 md:p-8 rounded-[2rem] border border-white/60 bg-white/40 backdrop-blur-lg shadow-xl shadow-stone-200/50">
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[#4a4a4a] mb-6 border-b border-[#a3b18a]/20 pb-4">
             {safeListing.title}
           </h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {/* Image Gallery */}
             <div className="space-y-3">
               {safeListing.photos[0] ? (
                 <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-lg shadow-stone-300/50 border border-white/50">
@@ -179,7 +174,6 @@ export default async function BookDetailPage({
                 </div>
               )}
 
-              {/* Thumbnail Grid */}
               {safeListing.photos.length > 1 && (
                 <div className="grid grid-cols-4 gap-2">
                   {safeListing.photos.slice(1).map((photo, i) => (
@@ -198,7 +192,6 @@ export default async function BookDetailPage({
               )}
             </div>
 
-            {/* Details Section */}
             <div className="flex flex-col h-full">
               <div className="flex-grow space-y-5">
                 <div>
@@ -269,12 +262,30 @@ export default async function BookDetailPage({
                 )}
               </div>
 
-              {/* Action Buttons — always same row, same height */}
               <div className="pt-5 mt-5 border-t border-[#a3b18a]/20">
                 <div className="flex flex-row items-stretch gap-3">
-                  {!isOwner && (
+                  {isOwner ? (
+                    <Link
+                      href={`/book_listing/${safeListing.id}/edit`}
+                      className="flex-1 min-h-[56px] px-5 rounded-full border-2 border-[#bc8a5f] text-[#bc8a5f] hover:bg-[#bc8a5f] hover:text-white font-bold transition-all flex items-center justify-center gap-2"
+                    >
+                      <svg
+                        className="w-5 h-5 shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M16.862 4.487a2.25 2.25 0 113.182 3.182L8.25 19.463 4 20l.537-4.25L16.862 4.487z"
+                        />
+                      </svg>
+                      Edit listing
+                    </Link>
+                  ) : (
                     <>
-                      {/* Borrow — wrapped so it can stretch */}
                       <div className="flex-1">
                         <BorrowModal
                           title={safeListing.title}
@@ -283,7 +294,6 @@ export default async function BookDetailPage({
                         />
                       </div>
 
-                      {/* Send a message */}
                       <form action={startConversation} className="flex-1">
                         <button
                           type="submit"
@@ -308,7 +318,6 @@ export default async function BookDetailPage({
                     </>
                   )}
 
-                  {/* Favorite */}
                   <button className="flex-1 min-h-[56px] px-5 rounded-full border-2 border-[#a3b18a] text-[#5a7d5a] hover:bg-[#a3b18a] hover:text-white font-bold transition-all flex items-center justify-center gap-2">
                     <svg
                       className="w-5 h-5 shrink-0"
@@ -333,4 +342,4 @@ export default async function BookDetailPage({
       </div>
     </main>
   );
-} 
+}
