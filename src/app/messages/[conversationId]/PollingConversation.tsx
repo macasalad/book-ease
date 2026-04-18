@@ -2,6 +2,21 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
+type MessageItem =
+  | {
+      type: "divider";
+      id: string;
+      label: string;
+      date: string | Date;
+    }
+  | {
+      type: "message";
+      id: string;
+      content: string;
+      createdAt: string | Date;
+      senderId: string;
+    };
+
 type Message = {
   id: string;
   content: string;
@@ -18,11 +33,13 @@ export default function PollingConversation({
 }: {
   currentUserId: string;
   conversationId: string;
-  initialMessages: Message[];
+  initialMessages: Array<Message | MessageItem>;
   initialOtherUserLastReadAt: string | null;
   sendMessage: (formData: FormData) => Promise<void>;
 }) {
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState<Array<Message | MessageItem>>(
+    initialMessages
+  );
   const [otherUserLastReadAt, setOtherUserLastReadAt] = useState<string | null>(
     initialOtherUserLastReadAt
   );
@@ -82,13 +99,14 @@ export default function PollingConversation({
   }, [messages]);
 
   const lastMyMessage = useMemo(() => {
-    const mine = [...messages].reverse().find((message) => message.senderId === currentUserId);
-    return mine ?? null;
+    const mine = [...messages]
+      .reverse()
+      .find((message) => "senderId" in message && message.senderId === currentUserId);
+    return mine && "senderId" in mine ? mine : null;
   }, [messages, currentUserId]);
 
   const lastMyMessageSeen = useMemo(() => {
     if (!lastMyMessage || !otherUserLastReadAt) return false;
-
     return new Date(otherUserLastReadAt) >= new Date(lastMyMessage.createdAt);
   }, [lastMyMessage, otherUserLastReadAt]);
 
@@ -112,7 +130,18 @@ export default function PollingConversation({
           </div>
         ) : (
           <div className="space-y-4">
-            {messages.map((message) => {
+            {messages.map((item) => {
+              if ("type" in item && item.type === "divider") {
+                return (
+                  <div key={item.id} className="flex justify-center py-2">
+                    <div className="rounded-full bg-white/70 px-4 py-1 text-[11px] font-semibold text-[#8a8a8a] border border-white/60 shadow-sm">
+                      {item.label}
+                    </div>
+                  </div>
+                );
+              }
+
+              const message = item as Message;
               const isMine = message.senderId === currentUserId;
               const isLastMyMessage = lastMyMessage?.id === message.id;
 
