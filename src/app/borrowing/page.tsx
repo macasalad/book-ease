@@ -25,8 +25,7 @@ export default async function BorrowingPage() {
     select: {
       id: true,
       borrowedAt: true,
-      dueAt: true,
-      extended: true,
+      // Removed dueAt and extended here to fix the Prisma error
       book: { 
         select: { 
           id: true, 
@@ -59,8 +58,7 @@ export default async function BorrowingPage() {
     select: {
       id: true,
       borrowedAt: true,
-      dueAt: true,
-      returnedAt: true,
+      returnedAt: true, // Removed dueAt here as well
       book: { 
         select: { 
           id: true, 
