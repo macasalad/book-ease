@@ -43,7 +43,7 @@ export default function ReturnBookButton({
     <button
       onClick={handleReturn}
       disabled={loading}
-      className="px-4 py-2 rounded-full bg-[#bc8a5f] text-white text-sm font-semibold hover:bg-[#8da074] transition"
+      className="px-4 py-2 rounded-full bg-[#bc8a5f] text-white text-sm font-semibold hover:bg-[#8f6746] transition"
     >
       {loading ? "Processing..." : "Return Book"}
     </button>

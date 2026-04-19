@@ -55,7 +55,7 @@ export default async function LendingPage() {
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#bc8a5f]/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
-        <div className="flex justify-between items-end mb-10 border-b border-[#a3b18a]/30 pb-6">
+        <div className="flex justify-between items-end mb-4 border-b border-[#a3b18a]/30 pb-6">
           <div>
             <h1 className="text-4xl font-bold tracking-tight text-[#4a4a4a]">
               My Lent Books
@@ -66,7 +66,7 @@ export default async function LendingPage() {
           </div>
         </div>
         
-        <section className="mb-8">
+        <section className="mb-4">
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-[#4a4a4a]">
             <span className="w-2.5 h-2.5 bg-[#bc8a5f] rounded-full shadow-sm"></span>
             Borrow Requests ({requests.length})

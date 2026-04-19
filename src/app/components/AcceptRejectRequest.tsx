@@ -126,7 +126,7 @@ export default function AcceptRejectRequest({
           <button
             onClick={() => handleAction("REJECTED")}
             disabled={loading}
-            className="flex-1 sm:flex-none px-6 py-2 bg-white/50 hover:bg-red-50 text-[#8a8a8a] hover:text-red-400 border border-[#a3b18a]/20 text-sm font-bold rounded-full transition-all disabled:opacity-50"
+            className="flex-1 sm:flex-none px-6 py-2 bg-[#b85c5c] text-white text-sm font-bold rounded-full transition-all hover:bg-[#a24f4f] disabled:opacity-50"
           >
             {loading ? "..." : "Reject"}
           </button>
