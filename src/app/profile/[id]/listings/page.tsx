@@ -91,7 +91,7 @@ export default async function UserListings({ params }: ListingsProps) {
           {/* Only show "Add New Listing" if it's their own page */}
           {isOwnListings && (
             <Link 
-              href="/book_listing/new" 
+              href="/book_listing/new_book" 
               className="px-6 py-2.5 bg-[#bc8a5f] hover:bg-[#a47148] text-white font-bold rounded-full transition-all shadow-lg shadow-[#bc8a5f]/20 active:scale-95"
             >
               + Add New Book
