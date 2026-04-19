@@ -136,7 +136,7 @@ export default async function UserProfile({ params }: ProfileProps) {
               {/* Send Message */}
               {!isOwnProfile && (
                 <Link
-                href={`/messages/cmnty7ffp0000vp8gdr50xd9b`}
+                href={`/messages/start/${profileUser.id}`}
                 className="px-8 py-2.5 bg-[#bc8a5f] hover:bg-[#a47148] text-white font-bold rounded-full transition-all shadow-lg shadow-[#bc8a5f]/20 active:scale-95"
               >
                 Send Message
