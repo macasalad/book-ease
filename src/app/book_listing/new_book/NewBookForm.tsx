@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 type FormState = {
@@ -27,6 +28,23 @@ type SearchResult = {
       title?: string;
     }>;
   };
+};
+
+type BookListing = {
+  id: string;
+  title: string;
+  author: string;
+  category: string;
+  condition: string;
+  isbn: string | null;
+  description: string | null;
+  photos: string[];
+};
+
+type NewBookFormProps = {
+  mode?: "create" | "edit";
+  listingId?: string;
+  initialListing?: BookListing;
 };
 
 const initialState: FormState = {
@@ -83,12 +101,32 @@ function looksLikeISBN(value: string) {
   return /^[0-9Xx-]+$/.test(value) && cleaned.length >= 10;
 }
 
-export default function NewBookForm() {
-  const [form, setForm] = useState<FormState>(initialState);
+export default function NewBookForm({
+  mode = "create",
+  listingId,
+  initialListing,
+}: NewBookFormProps) {
+  const router = useRouter();
+  const [form, setForm] = useState<FormState>(() =>
+    initialListing
+      ? {
+          title: initialListing.title ?? "",
+          author: initialListing.author ?? "",
+          category: initialListing.category ?? "",
+          condition: initialListing.condition ?? "",
+          isbn: initialListing.isbn ?? "",
+          description: initialListing.description ?? "",
+          photos: [],
+        }
+      : initialState
+  );
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [isSearchingISBN, setIsSearchingISBN] = useState(false);
-  const [isbnMessage, setIsbnMessage] = useState<{ text: string; type: "error" | "success" } | null>(null);
+  const [isbnMessage, setIsbnMessage] = useState<{
+    text: string;
+    type: "error" | "success";
+  } | null>(null);
 
   const [titleResults, setTitleResults] = useState<SearchResult[]>([]);
   const [showTitleResults, setShowTitleResults] = useState(false);
@@ -96,17 +134,30 @@ export default function NewBookForm() {
 
   const searchBoxRef = useRef<HTMLDivElement | null>(null);
 
+  useEffect(() => {
+    if (!initialListing) return;
+
+    setForm({
+      title: initialListing.title ?? "",
+      author: initialListing.author ?? "",
+      category: initialListing.category ?? "",
+      condition: initialListing.condition ?? "",
+      isbn: initialListing.isbn ?? "",
+      description: initialListing.description ?? "",
+      photos: [],
+    });
+  }, [initialListing]);
+
   const canSubmit = useMemo(() => {
     const requiredTextOk =
       form.title.trim() &&
       form.author.trim() &&
       form.category.trim() &&
-      form.condition.trim() &&
-      form.isbn.trim();
+      form.condition.trim();
 
-    const photosOk = form.photos.length >= 1;
+    const photosOk = mode === "edit" ? true : form.photos.length >= 1;
     return Boolean(requiredTextOk && photosOk);
-  }, [form]);
+  }, [form, mode]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -315,8 +366,13 @@ export default function NewBookForm() {
 
       for (const file of form.photos) fd.append("photos", file);
 
-      const res = await fetch("/api/book_listing", {
-        method: "POST",
+      const url =
+        mode === "edit" && listingId
+          ? `/api/book_listing/${listingId}`
+          : "/api/book_listing";
+
+      const res = await fetch(url, {
+        method: mode === "edit" ? "PATCH" : "POST",
         body: fd,
       });
 
@@ -325,10 +381,15 @@ export default function NewBookForm() {
         throw new Error(msg || "Failed to save listing.");
       }
 
-      setForm(initialState);
-      setTitleResults([]);
-      setShowTitleResults(false);
-      alert("Book listed successfully!");
+      if (mode === "edit") {
+        alert("Book listing updated successfully!");
+        router.push("/dashboard");
+        router.refresh();
+      } else {
+        alert("Book listed successfully!");
+        router.push("/dashboard");
+        router.refresh();
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -340,7 +401,7 @@ export default function NewBookForm() {
     <form onSubmit={onSubmit} className="flex flex-col space-y-6">
       <div className="p-5 bg-white/30 rounded-2xl border border-white/50 mb-4">
         <label className="text-[#8a8a8a] text-sm font-semibold uppercase tracking-wider block mb-2">
-          Search by ISBN or by book Title
+          Search by ISBN or book title (optional)
         </label>
 
         <div ref={searchBoxRef} className="relative">
@@ -432,7 +493,9 @@ export default function NewBookForm() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className={`text-sm mt-2 ${isbnMessage.type === "error" ? "text-[#8b4513]" : "text-[#5a7d5a]"}`}
+              className={`text-sm mt-2 ${
+                isbnMessage.type === "error" ? "text-[#8b4513]" : "text-[#5a7d5a]"
+              }`}
             >
               {isbnMessage.text}
             </motion.p>
@@ -505,10 +568,18 @@ export default function NewBookForm() {
               file:bg-[#a3b18a]/20 file:text-[#4a4a4a]
               hover:file:bg-[#a3b18a]/30 transition-all cursor-pointer"
           />
+          {mode === "edit" && initialListing?.photos?.length ? (
+            <p className="mt-2 text-xs text-[#8a8a8a]">
+              Existing photos: {initialListing.photos.length}
+            </p>
+          ) : null}
           {form.photos.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
               {form.photos.map((f, i) => (
-                <span key={i} className="bg-white/60 text-[#5c5c5c] text-xs px-3 py-1.5 rounded-full border border-white">
+                <span
+                  key={i}
+                  className="bg-white/60 text-[#5c5c5c] text-xs px-3 py-1.5 rounded-full border border-white"
+                >
                   {f.name}
                 </span>
               ))}
@@ -536,7 +607,13 @@ export default function NewBookForm() {
           disabled={!canSubmit || submitting}
           className="w-full md:w-auto px-10 py-3 bg-[#bc8a5f] hover:bg-[#a47148] text-white font-bold rounded-full transition-all shadow-lg shadow-[#bc8a5f]/20 disabled:opacity-50"
         >
-          {submitting ? "Saving Listing..." : "Save Listing"}
+          {submitting
+            ? mode === "edit"
+              ? "Updating Listing..."
+              : "Saving Listing..."
+            : mode === "edit"
+              ? "Update Listing"
+              : "Save Listing"}
         </button>
       </div>
     </form>
@@ -567,4 +644,3 @@ function Field({
     </div>
   );
 }
-

@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { auth } from "../../../../auth";
 import { PrismaClient } from "@prisma/client";
 import BorrowModal from "../components/BorrowModal";
+import FavoriteButton from "../../components/FavoriteButton";
 
 const prisma = new PrismaClient();
 
@@ -18,10 +19,9 @@ export default async function BookDetailPage({
   const { listingId } = await params;
 
   if (!listingId) {
-    redirect("/dashboard");
+    redirect("/book_listing");
   }
 
-  // fetch single book listing
   const listing = await prisma.bookListing.findUnique({
     where: { id: listingId },
     select: {
@@ -43,15 +43,20 @@ export default async function BookDetailPage({
           customImage: true,
         },
       },
+      favoritedBy: {
+        where: { userId: session.user.id },
+        select: { id: true }
+      }
     },
   });
 
   if (!listing) {
-    redirect("/dashboard");
+    redirect("/book_listing");
   }
 
   const safeListing = listing;
   const isOwner = session.user.id === safeListing.user.id;
+  const initialIsFavorited = safeListing.favoritedBy && safeListing.favoritedBy.length > 0;
 
   async function startConversation() {
     "use server";
@@ -133,15 +138,13 @@ export default async function BookDetailPage({
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] overflow-x-hidden relative font-sans p-6 md:p-10">
-      {/* Background Decorative Circles */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-[#a3b18a]/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#bc8a5f]/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="mx-auto max-w-7xl relative z-10">
-        {/* Back Link */}
         <div className="mb-4 ml-2">
           <Link
-            href="/dashboard"
+            href="/book_listing"
             className="inline-flex items-center gap-2 text-[#8a8a8a] hover:text-[#bc8a5f] transition-colors font-medium"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,14 +159,12 @@ export default async function BookDetailPage({
           </Link>
         </div>
 
-        {/* Main Glass Container */}
         <div className="w-full p-6 md:p-8 rounded-[2rem] border border-white/60 bg-white/40 backdrop-blur-lg shadow-xl shadow-stone-200/50">
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[#4a4a4a] mb-6 border-b border-[#a3b18a]/20 pb-4">
             {safeListing.title}
           </h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {/* Image Gallery */}
             <div className="space-y-3">
               {safeListing.photos[0] ? (
                 <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-lg shadow-stone-300/50 border border-white/50">
@@ -179,7 +180,6 @@ export default async function BookDetailPage({
                 </div>
               )}
 
-              {/* Thumbnail Grid */}
               {safeListing.photos.length > 1 && (
                 <div className="grid grid-cols-4 gap-2">
                   {safeListing.photos.slice(1).map((photo, i) => (
@@ -198,7 +198,6 @@ export default async function BookDetailPage({
               )}
             </div>
 
-            {/* Details Section */}
             <div className="flex flex-col h-full">
               <div className="flex-grow space-y-5">
                 <div>
@@ -254,6 +253,12 @@ export default async function BookDetailPage({
                         </Link>
                       </div>
                     </div>
+                    
+                    <div className="grid grid-cols-1 pt-2 mt-1 border-t border-[#a3b18a]/20">
+                      <div className="mt-2">
+                        <FavoriteButton bookId={safeListing.id} initialIsFavorited={initialIsFavorited} variant="text" />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -270,67 +275,47 @@ export default async function BookDetailPage({
               </div>
 
               {/* Action Buttons — always same row, same height */}
-              <div className="pt-5 mt-5 border-t border-[#a3b18a]/20">
-                <div className="flex flex-row items-stretch gap-3">
-                  {!isOwner && (
-                    <>
-                      {/* Borrow — wrapped so it can stretch */}
-                      <div className="flex-1">
-                        <BorrowModal
-                          title={safeListing.title}
-                          lender={safeListing.user}
-                          bookId={safeListing.id}
-                        />
-                      </div>
-
-                      {/* Send a message */}
-                      <form action={startConversation} className="flex-1">
-                        <button
-                          type="submit"
-                          className="w-full h-full min-h-[56px] px-5 rounded-full border-2 border-[#bc8a5f] text-[#bc8a5f] hover:bg-[#bc8a5f] hover:text-white font-bold transition-all flex items-center justify-center gap-2"
-                        >
-                          <svg
-                            className="w-5 h-5 shrink-0"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M8 10h8M8 14h5m-9 7l2.5-2.5A2 2 0 013 17h14a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10l-2 4z"
-                            />
-                          </svg>
-                          Send a message
-                        </button>
-                      </form>
-                    </>
-                  )}
-
-                  {/* Favorite */}
-                  <button className="flex-1 min-h-[56px] px-5 rounded-full border-2 border-[#a3b18a] text-[#5a7d5a] hover:bg-[#a3b18a] hover:text-white font-bold transition-all flex items-center justify-center gap-2">
-                    <svg
-                      className="w-5 h-5 shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              {!isOwner && (
+                <div className="pt-5 mt-5 border-t border-[#a3b18a]/20">
+                  <div className="flex flex-row items-stretch gap-3">
+                    {/* Borrow — wrapped so it can stretch */}
+                    <div className="flex-1">
+                      <BorrowModal
+                        title={safeListing.title}
+                        lender={safeListing.user}
+                        bookId={safeListing.id}
                       />
-                    </svg>
-                    Favorite
-                  </button>
+                    </div>
+
+                    {/* Send a message */}
+                    <form action={startConversation} className="flex-1">
+                      <button
+                        type="submit"
+                        className="w-full h-full min-h-[56px] px-5 rounded-full border-2 border-[#bc8a5f] text-[#bc8a5f] hover:bg-[#bc8a5f] hover:text-white font-bold transition-all flex items-center justify-center gap-2"
+                      >
+                        <svg
+                          className="w-5 h-5 shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 10h8M8 14h5m-9 7l2.5-2.5A2 2 0 013 17h14a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10l-2 4z"
+                          />
+                        </svg>
+                        Send a message
+                      </button>
+                    </form>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
       </div>
     </main>
   );
-} 
+}

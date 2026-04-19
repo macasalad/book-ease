@@ -5,6 +5,8 @@ import { auth } from "../../../auth";
 import { headers } from "next/headers";
 import BookSearchBar from "../components/BookSearchBar";
 import BookFilters from "../components/BookFilters";
+import { prisma } from "@/lib/prisma";
+import FavoriteButton from "../components/FavoriteButton";
 
 type Listing = {
   id: string;
@@ -13,6 +15,7 @@ type Listing = {
   author: string;
   condition: string;
   isBorrowed?: boolean;
+  isFavorited?: boolean;
 };
 
 export default async function Dashboard({
@@ -23,12 +26,22 @@ export default async function Dashboard({
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
 
+  let loggedInUserId: string | null = null;
+  if (session?.user?.email) {
+    const userRecord = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    });
+    loggedInUserId = userRecord?.id || null;
+  }
+
   const resolvedParams = await searchParams; // Await searchParams once
   const trimmedSearch = resolvedParams.search?.trim() ?? "";
 
   const baseUrl = "http://localhost:3000";
 
   const queryParams = new URLSearchParams();
+  if (loggedInUserId) queryParams.set("exclude", loggedInUserId);
   if (trimmedSearch) queryParams.set("search", trimmedSearch);
   if (resolvedParams.category) queryParams.set("category", resolvedParams.category);
   if (resolvedParams.condition) queryParams.set("condition", resolvedParams.condition);
@@ -40,8 +53,11 @@ export default async function Dashboard({
     ? `${baseUrl}/api/book_listing?${queryString}`
     : `${baseUrl}/api/book_listing`;
 
+  const reqHeaders = new Headers(await headers());
+
   const res = await fetch(endpoint, {
     cache: "no-store",
+    headers: reqHeaders,
   });
 
   const data = (await res.json()) as { items: Listing[] };
@@ -52,11 +68,11 @@ export default async function Dashboard({
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] overflow-x-hidden relative font-sans">
 
-      <div className="absolute top-40 left-10 w-72 h-72 bg-[#a3b18a]/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-20 left-10 w-72 h-72 bg-[#a3b18a]/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#bc8a5f]/10 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
-        <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
+      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+        <div className="flex justify-between items-end mb-6 border-b border-[#a3b18a]/30 pb-6">
           <div>
             <h1 className="text-4xl font-bold tracking-tight text-[#4a4a4a]">Book Catalog</h1>
             <p className="text-[#8a8a8a] mt-2 font-medium">
@@ -141,6 +157,9 @@ export default async function Dashboard({
                   </span>
                 )}
 
+                <div className="ml-auto -mr-2 -mt-1 -mb-1">
+                  <FavoriteButton bookId={b.id} initialIsFavorited={b.isFavorited || false} />
+                </div>
               </div>
             </Link>
           ))}

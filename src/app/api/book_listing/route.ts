@@ -3,6 +3,7 @@ import path from "path";
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "@/auth";
+import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
   const photoUrls: string[] = [];
 
   // required fields (everything except description)
-  if (!title || !author || !category || !condition || !isbn) {
+  if (!title || !author || !category || !condition) {
     return NextResponse.json(
       { error: "Missing required fields." },
       { status: 400 }
@@ -53,13 +54,13 @@ export async function POST(request: Request) {
     const file = photos[i];
     const filename = `book_${Date.now()}_${i}.${file.name.split(".").pop()}`;
     const buffer = Buffer.from(await file.arrayBuffer());
-    
+
     const uploadDir = path.join(process.cwd(), "public", "uploads", "book_covers");
     const filepath = path.join(uploadDir, filename);
-    
+
     await mkdir(uploadDir, { recursive: true });
     await writeFile(filepath, buffer);
-    
+
     photoUrls.push(`/uploads/book_covers/${filename}`);
   }
 
@@ -71,23 +72,31 @@ export async function POST(request: Request) {
       author,
       category,
       condition,
-      isbn,
+      isbn: isbn || "",
       description: description || null,
       photos: photoUrls,
     },
     select: { id: true, title: true, photos: true },
   });
 
+  revalidatePath("/dashboard");
+  revalidatePath("/book_listing");
+
   return NextResponse.json({ ok: true, listing: created }, { status: 201 });
 }
 
 export async function GET(request: Request) {
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
+
   // Extract query parameters from the URL
   const { searchParams } = new URL(request.url);
   const search = searchParams.get("search");
   const category = searchParams.get("category");
   const condition = searchParams.get("condition");
   const status = searchParams.get("status");
+  const excludeUserId = searchParams.get("exclude");
 
   // Build the dynamic 'where' object for Prisma
   const where: any = {};
@@ -111,6 +120,10 @@ export async function GET(request: Request) {
     where.status = status;
   }
 
+  if (excludeUserId) {
+    where.userId = { not: excludeUserId };
+  }
+
   const items = await prisma.bookListing.findMany({
     where, // Apply the filters here
     orderBy: { createdAt: "desc" },
@@ -129,13 +142,18 @@ export async function GET(request: Request) {
           id: true,
         }
       },
+      favoritedBy: session?.user?.id ? {
+        where: { userId: session.user.id },
+        select: { id: true }
+      } : false,
     },
     take: 24,
   });
 
-  const itemsWithBorrowStatus = items.map((item: { status: string; }) => ({
+  const itemsWithBorrowStatus = items.map((item: any) => ({
     ...item,
-    isBorrowed: item.status === "BORROWED" 
+    isBorrowed: item.status === "BORROWED",
+    isFavorited: item.favoritedBy ? item.favoritedBy.length > 0 : false
   }));
 
   return NextResponse.json({ items: itemsWithBorrowStatus });

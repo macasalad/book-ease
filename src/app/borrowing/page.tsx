@@ -1,11 +1,10 @@
-// app/borrowing/page.tsx
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { PrismaClient } from "@prisma/client";
 import ReturnBookButton from "@/components/ReturnBookButton";
 import Link from "next/link";
-import { SignOutButton } from "@/components/SignOutButton";
+import ExtendBorrowModal from "@/components/ExtendBorrowModal";
 
 const prisma = new PrismaClient();
 
@@ -14,19 +13,18 @@ export default async function BorrowingPage() {
   if (!session) redirect("/sign-in");
 
   const userId = session.user.id;
+  const now = new Date();
 
-  // Fetch active borrow records where current user is the borrower
   const activeBorrows = await prisma.borrowRecord.findMany({
     where: { 
       borrowerId: userId,
-      returnedAt: null // Only currently borrowed books
+      returnedAt: null
     },
     orderBy: { borrowedAt: "desc" },
     select: {
       id: true,
       borrowedAt: true,
       dueAt: true,
-      extended: true,
       book: { 
         select: { 
           id: true, 
@@ -48,19 +46,18 @@ export default async function BorrowingPage() {
     },
   });
 
-  // Fetch borrowing history (returned books)
   const borrowHistory = await prisma.borrowRecord.findMany({
     where: { 
       borrowerId: userId,
       NOT: { returnedAt: null }
     },
     orderBy: { returnedAt: "desc" },
-    take: 10, // Limit history to last 10
+    take: 10,
     select: {
       id: true,
       borrowedAt: true,
-      dueAt: true,
       returnedAt: true,
+      dueAt: true,
       book: { 
         select: { 
           id: true, 
@@ -81,7 +78,6 @@ export default async function BorrowingPage() {
     },
   });
 
-  // Fetch pending requests made by this user
   const pendingRequests = await prisma.borrowRequest.findMany({
     where: { 
       borrowerId: userId,
@@ -99,27 +95,76 @@ export default async function BorrowingPage() {
           author: true,
           photos: true,
           user: { 
-            select: { name: true } 
+            select: {
+              id: true,
+              customImage: true,
+              image: true,
+              name: true,
+            } 
           }
         } 
       },
     },
   });
 
+  const getDueStatus = (dueAt: Date | null) => {
+    if (!dueAt) return { text: "No due date", color: "text-gray-400" };
+  
+    const now = new Date();
+    const dueDate = new Date(dueAt);
+  
+    now.setHours(0, 0, 0, 0);
+    dueDate.setHours(0, 0, 0, 0);
+  
+    const diffTime = dueDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+    if (diffDays < 0) {
+      return {
+        text: `Overdue by ${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? "s" : ""}`,
+        color: "text-[#7D1128] font-bold",
+      };
+    }
+  
+    if (diffDays === 0) {
+      return { text: "Due today", color: "text-[#7D1128] font-bold" };
+    }
+  
+    if (diffDays <= 3) {
+      return {
+        text: `Due in ${diffDays} day${diffDays > 1 ? "s" : ""}`,
+        color: "text-amber-600 font-medium",
+      };
+    }
+  
+    return {
+      text: `Due in ${diffDays} days`,
+      color: "text-[#5a7d5a] font-medium",
+    };
+  };
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] overflow-x-hidden relative font-sans">
+    <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] relative font-sans pb-12">
       
-      {/* Background Decorative Circles */}
-      <div className="absolute top-40 left-10 w-72 h-72 bg-[#a3b18a]/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-20 left-10 w-72 h-72 bg-[#a3b18a]/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#bc8a5f]/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
-        <h1 className="text-3xl font-bold tracking-tight text-[#4a4a4a] mb-4">My Borrowed Books</h1>
+        <div className="flex justify-between items-end mb-4 border-b border-[#a3b18a]/30 pb-6">
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight text-[#4a4a4a]">
+              My Borrowed Books
+            </h1>
+            <p className="text-[#8a8a8a] mt-2 font-medium">
+              Borrowing History
+            </p>
+          </div>
+        </div>
 
         {/* Currently Borrowed Section */}
         <section className="mb-4">
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-[#4a4a4a]">
-            <span className="w-2.5 h-2.5 bg-[#5a7d5a] rounded-full shadow-sm"></span>
+            <span className="w-2.5 h-2.5 bg-[#a3b18a] rounded-full shadow-sm"></span>
             Currently Borrowed ({activeBorrows.length})
           </h2>
 
@@ -132,9 +177,9 @@ export default async function BorrowingPage() {
               {activeBorrows.map((borrow) => (
                 <div key={borrow.id} className="bg-white/40 border border-white/60 rounded-[1.5rem] p-5 shadow-lg shadow-stone-200/30 backdrop-blur-md hover:bg-white/60 transition-all flex flex-col sm:flex-row gap-5">
                   {/* Standardized Book Image */}
-                  <div className="w-24 h-32 rounded-xl overflow-hidden border border-white/50 shadow-inner bg-[#e2d9c8]/50 shrink-0 flex items-center justify-center">
+                  <div className="w-24 h-40 rounded-xl overflow-hidden border border-white/50 shadow-inner bg-[#e2d9c8]/50 shrink-0 flex items-center justify-center">
                     {borrow.book.photos[0] ? (
-                      <img src={borrow.book.photos[0]} alt={borrow.book.title} className="w-full h-full object-cover" />
+                      <img src={borrow.book.photos[0]} alt={borrow.book.title} className="h-full w-full object-cover object-center" />
                     ) : (
                       <span className="text-4xl opacity-50">📖</span>
                     )}
@@ -144,34 +189,63 @@ export default async function BorrowingPage() {
                     <div>
                       <h3 className="text-lg font-bold text-[#4a4a4a] leading-tight">{borrow.book.title}</h3>
                       <p className="text-sm text-[#8a8a8a]">by {borrow.book.author}</p>
-                      <div className="mt-2 text-sm text-[#5c5c5c] space-y-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold">Lent by:</span>
+                      <div className="mt-2 text-sm text-[#5c5c5c] space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">Lender:</span>
+                          <Link
+                            href={`/profile/${borrow.book.user.id}`}
+                            className="flex items-center gap-2 hover:text-[#bc8a5f] transition-colors"
+                          >
+                            <img
+                              src={
+                                borrow.book.user.customImage ||
+                                borrow.book.user.image ||
+                                "/default-avatar.png"
+                              }
+                              className="w-6 h-6 rounded-full object-cover border border-white/60"
+                              alt={borrow.book.user.name}
+                            />
 
-                        <Link
-                          href={`/profile/${borrow.book.user.id}`}
-                          className="flex items-center gap-2 hover:text-[#bc8a5f] transition-colors"
-                        >
-                          <img
-                            src={
-                              borrow.book.user.customImage ||
-                              borrow.book.user.image ||
-                              "/default-avatar.png"
-                            }
-                            className="w-6 h-6 rounded-full object-cover border border-white/60"
-                            alt={borrow.book.user.name}
-                          />
+                            <span className="font-medium">
+                              {borrow.book.user.name}
+                            </span>
+                          </Link>
+                        </div>
 
-                          <span className="font-medium">
-                            {borrow.book.user.name}
-                          </span>
-                        </Link>
-                      </div>
-                        <p><span className="font-semibold">Borrowed:</span> {new Date(borrow.borrowedAt).toLocaleDateString()}</p>
+                        <div className="space-y-1">
+                          <p>
+                            <span className="font-semibold">Borrowed on:</span>{" "}
+                            {new Date(borrow.borrowedAt).toLocaleDateString()}
+                          </p>
+
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold">Return by:</span>
+
+                            <span>
+                              {new Date(borrow.dueAt!).toLocaleDateString()}
+                            </span>
+
+                            {(() => {
+                              const status = getDueStatus(borrow.dueAt);
+
+                              return (
+                                <span className={`text-xs ${status.color}`}>
+                                  ({status.text})
+                                </span>
+                              );
+                            })()}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="mt-3">
-                      <ReturnBookButton borrowId={borrow.id} bookId={borrow.book.id} />
+                    <div className="mt-4 flex gap-2">
+                        <ReturnBookButton borrowId={borrow.id} bookId={borrow.book.id} />
+                        <ExtendBorrowModal
+                          borrowId={borrow.id}
+                          bookId={borrow.book.id}
+                          lenderId={borrow.book.user.id}
+                          currentDueAt={borrow.dueAt}
+                        />
                     </div>
                   </div>
                 </div>
@@ -182,7 +256,7 @@ export default async function BorrowingPage() {
 
         {/* Pending Requests Section */}
         {pendingRequests.length > 0 && (
-          <section className="mb-2">
+          <section className="mb-4">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-[#4a4a4a]">
               <span className="w-2.5 h-2.5 bg-[#bc8a5f] rounded-full shadow-sm"></span>
               Pending Requests ({pendingRequests.length})
@@ -191,9 +265,9 @@ export default async function BorrowingPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {pendingRequests.map((request) => (
                 <div key={request.id} className="bg-white/40 border border-white/60 rounded-[1.5rem] p-5 shadow-lg shadow-stone-200/30 backdrop-blur-md hover:bg-white/60 transition-all flex flex-col sm:flex-row gap-5">
-                  <div className="w-24 h-32 rounded-xl overflow-hidden border border-white/50 shadow-inner bg-[#e2d9c8]/50 shrink-0 flex items-center justify-center">
+                  <div className="w-24 h-40 rounded-xl overflow-hidden border border-white/50 shadow-inner bg-[#e2d9c8]/50 shrink-0 flex items-center justify-center">
                     {request.book.photos[0] ? (
-                      <img src={request.book.photos[0]} alt={request.book.title} className="w-full h-full object-cover" />
+                      <img src={request.book.photos[0]} alt={request.book.title} className="h-full w-full object-cover object-center" />
                     ) : (
                       <span className="text-4xl opacity-50">📖</span>
                     )}
@@ -202,15 +276,46 @@ export default async function BorrowingPage() {
                     <div>
                       <h3 className="text-lg font-bold text-[#4a4a4a] leading-tight">{request.book.title}</h3>
                       <p className="text-sm text-[#8a8a8a]">by {request.book.author}</p>
-                      <div className="mt-2 text-sm text-[#5c5c5c] space-y-0.5">
+                      {/* <div className="mt-2 text-sm text-[#5c5c5c] space-y-0.5">
                         <p><span className="font-semibold">Owner:</span> {request.book.user.name}</p>
                         <p><span className="font-semibold">Requested:</span> {new Date(request.createdAt).toLocaleDateString()}</p>
+                      </div> */}
+                      <div className="mt-2 text-sm text-[#5c5c5c] space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">Lender:</span>
+                          <Link
+                            href={`/profile/${request.book.user.id}`}
+                            className="flex items-center gap-2 hover:text-[#bc8a5f] transition-colors"
+                          >
+                            <img
+                              src={
+                                request.book.user.customImage ||
+                                request.book.user.image ||
+                                "/default-avatar.png"
+                              }
+                              className="w-6 h-6 rounded-full object-cover border border-white/60"
+                              alt={request.book.user.name}
+                            />
+
+                            <span className="font-medium">
+                              {request.book.user.name}
+                            </span>
+                          </Link>
+                        </div>
+
+                        <div className="space-y-1">
+                          <p>
+                            <span className="font-semibold">Requested on:</span>{" "}
+                            {new Date(request.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+
+                        <div className="mt-3">
+                          <span className="inline-block px-3 py-1.5 bg-[#bc8a5f]/20 text-[#a47148] border border-[#bc8a5f]/30 text-xs font-bold uppercase tracking-wider rounded-full w-max">
+                            Pending approval
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="mt-3">
-                      <span className="inline-block px-3 py-1.5 bg-[#bc8a5f]/20 text-[#a47148] border border-[#bc8a5f]/30 text-xs font-bold uppercase tracking-wider rounded-full w-max">
-                        Pending approval
-                      </span>
                     </div>
                   </div>
                 </div>
@@ -223,16 +328,16 @@ export default async function BorrowingPage() {
         {borrowHistory.length > 0 && (
           <section className="mb-4">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-[#4a4a4a]">
-              <span className="w-2.5 h-2.5 bg-[#a3b18a] rounded-full shadow-sm"></span>
+              <span className="w-2.5 h-2.5 bg-[#7D1128] rounded-full shadow-sm"></span>
               History
             </h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {borrowHistory.map((borrow) => (
                 <div key={borrow.id} className="bg-white/40 border border-white/60 rounded-[1.5rem] p-5 shadow-lg shadow-stone-200/30 backdrop-blur-md hover:bg-white/60 transition-all flex flex-col sm:flex-row gap-5">
-                  <div className="w-24 h-32 rounded-xl overflow-hidden border border-white/50 shadow-inner bg-[#e2d9c8]/50 shrink-0 flex items-center justify-center">
+                  <div className="w-24 h-40 rounded-xl overflow-hidden border border-white/50 shadow-inner bg-[#e2d9c8]/50 shrink-0 flex items-center justify-center">
                     {borrow.book.photos[0] ? (
-                      <img src={borrow.book.photos[0]} alt={borrow.book.title} className="w-full h-full object-cover" />
+                      <img src={borrow.book.photos[0]} alt={borrow.book.title} className="h-full w-full object-cover object-center" />
                     ) : (
                       <span className="text-4xl opacity-50">📖</span>
                     )}
@@ -241,11 +346,40 @@ export default async function BorrowingPage() {
                     <div>
                       <h3 className="text-lg font-bold text-[#4a4a4a] leading-tight">{borrow.book.title}</h3>
                       <p className="text-sm text-[#8a8a8a]">by {borrow.book.author}</p>
-                      <div className="mt-2 text-sm text-[#5c5c5c] space-y-0.5">
-                        <p><span className="font-semibold">From:</span> {borrow.book.user.name}</p>
-                        <p><span className="font-semibold">Borrowed:</span> {new Date(borrow.borrowedAt).toLocaleDateString()}
-                        <span className="font-semibold"> Returned:</span> {new Date(borrow.returnedAt!).toLocaleDateString()} </p>
+                      <div className="mt-2 text-sm text-[#5c5c5c] space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">Lender:</span>
+                          <Link
+                            href={`/profile/${borrow.book.user.id}`}
+                            className="flex items-center gap-2 hover:text-[#bc8a5f] transition-colors"
+                          >
+                            <img
+                              src={
+                                borrow.book.user.customImage ||
+                                borrow.book.user.image ||
+                                "/default-avatar.png"
+                              }
+                              className="w-6 h-6 rounded-full object-cover border border-white/60"
+                              alt={borrow.book.user.name}
+                            />
 
+                            <span className="font-medium">
+                              {borrow.book.user.name}
+                            </span>
+                          </Link>
+                        </div>
+
+                        <div className="space-y-1">
+                          <p>
+                            <span className="font-semibold">Borrowed on:</span>{" "}
+                            {new Date(borrow.borrowedAt).toLocaleDateString()}
+                          </p>
+
+                          <p>
+                            <span className="font-semibold">Returned on:</span>{" "}
+                            {new Date(borrow.returnedAt!).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
                     </div>
                     <div className="mt-3">
