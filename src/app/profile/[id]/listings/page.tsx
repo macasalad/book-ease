@@ -83,7 +83,7 @@ export default async function UserListings({ params }: ListingsProps) {
             <h1 className="text-4xl font-bold tracking-tight text-[#4a4a4a]">
               {isOwnListings ? "My Book Listings" : `${profileUser.name || "User"}'s Listings`}
             </h1>
-            <p className="text-[#8a8a8a] mt-2">
+            <p className="text-[#8a8a8a] mt-2 font-medium">
             {availableCount} {availableCount === 1 ? 'book' : 'books'} available
             </p>
           </div>

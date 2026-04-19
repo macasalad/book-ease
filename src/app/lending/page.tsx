@@ -51,13 +51,21 @@ export default async function LendingPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] relative font-sans pb-12">
-      
       <div className="absolute top-20 left-10 w-72 h-72 bg-[#a3b18a]/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#bc8a5f]/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
-        <h1 className="text-3xl font-bold tracking-tight text-[#4a4a4a] mb-8">Lending Dashboard</h1>
-
+        <div className="flex justify-between items-end mb-10 border-b border-[#a3b18a]/30 pb-6">
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight text-[#4a4a4a]">
+              My Lent Books
+            </h1>
+            <p className="text-[#8a8a8a] mt-2 font-medium">
+              Lending History
+            </p>
+          </div>
+        </div>
+        
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-[#4a4a4a]">
             <span className="w-2.5 h-2.5 bg-[#bc8a5f] rounded-full shadow-sm"></span>
