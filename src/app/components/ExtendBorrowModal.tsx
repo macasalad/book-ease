@@ -53,6 +53,7 @@ export default function ExtendBorrowModal({
 
       alert("Extension request sent!");
       setOpen(false);
+      window.location.reload();
     } catch (err) {
       console.error(err);
       alert("Something went wrong");
