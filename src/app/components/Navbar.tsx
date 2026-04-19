@@ -62,9 +62,6 @@ export default function Navbar() {
           <Link href="/book_listing" className="hover:text-[#bc8a5f] transition-colors">
             Listing
           </Link>
-          <Link href="/catalog" className="hover:text-[#bc8a5f] transition-colors">
-            Catalog
-          </Link>
           <Link href="/borrowing" className="hover:text-[#bc8a5f] transition-colors">
             Borrowing
           </Link>
