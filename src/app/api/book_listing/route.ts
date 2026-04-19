@@ -3,6 +3,7 @@ import path from "path";
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "@/auth";
+import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 
@@ -71,12 +72,15 @@ export async function POST(request: Request) {
       author,
       category,
       condition,
-      isbn: isbn || null,
+      isbn: isbn || "",
       description: description || null,
       photos: photoUrls,
     },
     select: { id: true, title: true, photos: true },
   });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/book_listing");
 
   return NextResponse.json({ ok: true, listing: created }, { status: 201 });
 }

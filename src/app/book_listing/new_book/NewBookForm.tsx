@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 type FormState = {
@@ -105,6 +106,7 @@ export default function NewBookForm({
   listingId,
   initialListing,
 }: NewBookFormProps) {
+  const router = useRouter();
   const [form, setForm] = useState<FormState>(() =>
     initialListing
       ? {
@@ -381,11 +383,12 @@ export default function NewBookForm({
 
       if (mode === "edit") {
         alert("Book listing updated successfully!");
+        router.push("/dashboard");
+        router.refresh();
       } else {
-        setForm(initialState);
-        setTitleResults([]);
-        setShowTitleResults(false);
         alert("Book listed successfully!");
+        router.push("/dashboard");
+        router.refresh();
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");

@@ -60,10 +60,7 @@ export default function Navbar() {
             Home
           </Link>
           <Link href="/book_listing/new_book" className="hover:text-[#bc8a5f] transition-colors">
-            List a Book
-          </Link>
-          <Link href="/dashboard" className="hover:text-[#bc8a5f] transition-colors">
-            Catalog
+            My Listing
           </Link>
           <Link href="/profile/favorites" className="hover:text-[#bc8a5f] transition-colors">
             Favorites
