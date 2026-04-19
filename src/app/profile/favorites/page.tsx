@@ -30,26 +30,23 @@ export default async function FavoritesPage() {
     <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] overflow-x-hidden relative font-sans">
       <div className="absolute top-40 left-10 w-72 h-72 bg-[#a3b18a]/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#bc8a5f]/10 rounded-full blur-[120px] pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
-        <div className="mb-12">
-          <Link
-            href="/profile"
-            className="inline-flex items-center gap-2 text-[#8a8a8a] text-sm font-semibold hover:text-[#bc8a5f] transition-colors mb-4"
-          >
-            ← Back to Profile
-          </Link>
-          <h1 className="text-4xl font-bold tracking-tight text-[#4a4a4a]">My Favorites</h1>
-          <p className="text-[#8a8a8a] mt-2 font-medium">
-            Books you have saved for later.
-          </p>
-        </div>
+      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+      <div className="flex justify-between items-end mb-4 border-b border-[#a3b18a]/30 pb-6">
+      <div>
+        <h1 className="text-4xl font-bold tracking-tight text-[#4a4a4a]">
+          My Favorites
+        </h1>
+        <p className="text-[#8a8a8a] mt-2 font-medium">
+          Books you have saved for later.
+        </p>
+      </div>
+    </div>
 
         {favorites.length === 0 ? (
-          <div className="mt-12 rounded-[1.5rem] border border-white/60 bg-white/40 p-12 text-center backdrop-blur-md shadow-lg shadow-stone-200/30 max-w-2xl mx-auto">
-            <span className="text-6xl mb-4 block">📚</span>
+          <div className="mt-12 rounded-[1.5rem] border border-white/60 bg-white/40 p-12 text-center backdrop-blur-md shadow-lg shadow-stone-200/30 w-full">
+            <span className="text-6xl mb-6 block">📚</span>
             <p className="text-xl font-semibold text-[#4a4a4a] mb-2">
-              You haven't favorited any books yet.
+              You haven't liked any books yet.
             </p>
             <p className="text-[#8a8a8a] mb-6">
               When you see a book you like, click the heart icon to save it here.
