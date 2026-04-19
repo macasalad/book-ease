@@ -54,13 +54,13 @@ export async function POST(request: Request) {
     const file = photos[i];
     const filename = `book_${Date.now()}_${i}.${file.name.split(".").pop()}`;
     const buffer = Buffer.from(await file.arrayBuffer());
-    
+
     const uploadDir = path.join(process.cwd(), "public", "uploads", "book_covers");
     const filepath = path.join(uploadDir, filename);
-    
+
     await mkdir(uploadDir, { recursive: true });
     await writeFile(filepath, buffer);
-    
+
     photoUrls.push(`/uploads/book_covers/${filename}`);
   }
 
@@ -120,8 +120,12 @@ export async function GET(request: Request) {
     where.status = status;
   }
 
+  if (excludeUserId) {
+    where.userId = { not: excludeUserId };
+  }
+
   const items = await prisma.bookListing.findMany({
-    where: {...(excludeUserId ? { userId: { not: excludeUserId } } : {}),}, // Apply the filters here
+    where, // Apply the filters here
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
