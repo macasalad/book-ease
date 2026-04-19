@@ -74,7 +74,7 @@ export default async function UserListings({ params }: ListingsProps) {
       <div className="absolute top-20 left-10 w-72 h-72 bg-[#a3b18a]/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#bc8a5f]/10 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 py-16 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
         
         {/* Header Section */}
         <div className="flex justify-between items-end mb-10 border-b border-[#a3b18a]/30 pb-6">
