@@ -2,9 +2,9 @@ import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { PrismaClient } from '@prisma/client'
 import { inferAdditionalFields } from 'better-auth/client/plugins'
- 
+
 const prisma = new PrismaClient()
- 
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
@@ -17,5 +17,5 @@ export const auth = betterAuth({
   },
   plugins: [inferAdditionalFields()],
 })
- 
+
 export type Session = typeof auth.$Infer.Session

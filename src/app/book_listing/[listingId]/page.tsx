@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { auth } from "../../../../auth";
 import { PrismaClient } from "@prisma/client";
 import BorrowModal from "../components/BorrowModal";
+import FavoriteButton from "../../components/FavoriteButton";
 
 const prisma = new PrismaClient();
 
@@ -43,6 +44,10 @@ export default async function BookDetailPage({
           customImage: true,
         },
       },
+      favoritedBy: {
+        where: { userId: session.user.id },
+        select: { id: true }
+      }
     },
   });
 
@@ -52,6 +57,7 @@ export default async function BookDetailPage({
 
   const safeListing = listing;
   const isOwner = session.user.id === safeListing.user.id;
+  const initialIsFavorited = safeListing.favoritedBy && safeListing.favoritedBy.length > 0;
 
   async function startConversation() {
     "use server";
@@ -254,6 +260,12 @@ export default async function BookDetailPage({
                         </Link>
                       </div>
                     </div>
+                    
+                    <div className="grid grid-cols-1 pt-2 mt-1 border-t border-[#a3b18a]/20">
+                      <div className="mt-2">
+                        <FavoriteButton bookId={safeListing.id} initialIsFavorited={initialIsFavorited} variant="text" />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -270,63 +282,43 @@ export default async function BookDetailPage({
               </div>
 
               {/* Action Buttons — always same row, same height */}
-              <div className="pt-5 mt-5 border-t border-[#a3b18a]/20">
-                <div className="flex flex-row items-stretch gap-3">
-                  {!isOwner && (
-                    <>
-                      {/* Borrow — wrapped so it can stretch */}
-                      <div className="flex-1">
-                        <BorrowModal
-                          title={safeListing.title}
-                          lender={safeListing.user}
-                          bookId={safeListing.id}
-                        />
-                      </div>
-
-                      {/* Send a message */}
-                      <form action={startConversation} className="flex-1">
-                        <button
-                          type="submit"
-                          className="w-full h-full min-h-[56px] px-5 rounded-full border-2 border-[#bc8a5f] text-[#bc8a5f] hover:bg-[#bc8a5f] hover:text-white font-bold transition-all flex items-center justify-center gap-2"
-                        >
-                          <svg
-                            className="w-5 h-5 shrink-0"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M8 10h8M8 14h5m-9 7l2.5-2.5A2 2 0 013 17h14a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10l-2 4z"
-                            />
-                          </svg>
-                          Send a message
-                        </button>
-                      </form>
-                    </>
-                  )}
-
-                  {/* Favorite */}
-                  <button className="flex-1 min-h-[56px] px-5 rounded-full border-2 border-[#a3b18a] text-[#5a7d5a] hover:bg-[#a3b18a] hover:text-white font-bold transition-all flex items-center justify-center gap-2">
-                    <svg
-                      className="w-5 h-5 shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              {!isOwner && (
+                <div className="pt-5 mt-5 border-t border-[#a3b18a]/20">
+                  <div className="flex flex-row items-stretch gap-3">
+                    {/* Borrow — wrapped so it can stretch */}
+                    <div className="flex-1">
+                      <BorrowModal
+                        title={safeListing.title}
+                        lender={safeListing.user}
+                        bookId={safeListing.id}
                       />
-                    </svg>
-                    Favorite
-                  </button>
+                    </div>
+
+                    {/* Send a message */}
+                    <form action={startConversation} className="flex-1">
+                      <button
+                        type="submit"
+                        className="w-full h-full min-h-[56px] px-5 rounded-full border-2 border-[#bc8a5f] text-[#bc8a5f] hover:bg-[#bc8a5f] hover:text-white font-bold transition-all flex items-center justify-center gap-2"
+                      >
+                        <svg
+                          className="w-5 h-5 shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 10h8M8 14h5m-9 7l2.5-2.5A2 2 0 013 17h14a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10l-2 4z"
+                          />
+                        </svg>
+                        Send a message
+                      </button>
+                    </form>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

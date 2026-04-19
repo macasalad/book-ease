@@ -5,6 +5,7 @@ import { auth } from "../../../auth";
 import { headers } from "next/headers";
 import BookSearchBar from "../components/BookSearchBar";
 import BookFilters from "../components/BookFilters";
+import FavoriteButton from "../components/FavoriteButton";
 
 type Listing = {
   id: string;
@@ -13,6 +14,7 @@ type Listing = {
   author: string;
   condition: string;
   isBorrowed?: boolean;
+  isFavorited?: boolean;
 };
 
 export default async function Dashboard({
@@ -40,8 +42,11 @@ export default async function Dashboard({
     ? `${baseUrl}/api/book_listing?${queryString}`
     : `${baseUrl}/api/book_listing`;
 
+  const reqHeaders = new Headers(await headers());
+
   const res = await fetch(endpoint, {
     cache: "no-store",
+    headers: reqHeaders,
   });
 
   const data = (await res.json()) as { items: Listing[] };
@@ -141,6 +146,9 @@ export default async function Dashboard({
                   </span>
                 )}
 
+                <div className="ml-auto -mr-2 -mt-1 -mb-1">
+                  <FavoriteButton bookId={b.id} initialIsFavorited={b.isFavorited || false} />
+                </div>
               </div>
             </Link>
           ))}

@@ -82,6 +82,10 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
+
   // Extract query parameters from the URL
   const { searchParams } = new URL(request.url);
   const search = searchParams.get("search");
@@ -129,13 +133,18 @@ export async function GET(request: Request) {
           id: true,
         }
       },
+      favoritedBy: session?.user?.id ? {
+        where: { userId: session.user.id },
+        select: { id: true }
+      } : false,
     },
     take: 24,
   });
 
-  const itemsWithBorrowStatus = items.map((item: { status: string; }) => ({
+  const itemsWithBorrowStatus = items.map((item: any) => ({
     ...item,
-    isBorrowed: item.status === "BORROWED" 
+    isBorrowed: item.status === "BORROWED",
+    isFavorited: item.favoritedBy ? item.favoritedBy.length > 0 : false
   }));
 
   return NextResponse.json({ items: itemsWithBorrowStatus });
