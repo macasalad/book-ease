@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { auth } from "../../../../auth";
 import { PrismaClient } from "@prisma/client";
 import BorrowModal from "../components/BorrowModal";
+import FavoriteButton from "../../components/FavoriteButton";
 
 const prisma = new PrismaClient();
 
@@ -42,6 +43,10 @@ export default async function BookDetailPage({
           customImage: true,
         },
       },
+      favoritedBy: {
+        where: { userId: session.user.id },
+        select: { id: true }
+      }
     },
   });
 
@@ -51,6 +56,7 @@ export default async function BookDetailPage({
 
   const safeListing = listing;
   const isOwner = session.user.id === safeListing.user.id;
+  const initialIsFavorited = safeListing.favoritedBy && safeListing.favoritedBy.length > 0;
 
   async function startConversation() {
     "use server";
@@ -247,6 +253,12 @@ export default async function BookDetailPage({
                         </Link>
                       </div>
                     </div>
+                    
+                    <div className="grid grid-cols-1 pt-2 mt-1 border-t border-[#a3b18a]/20">
+                      <div className="mt-2">
+                        <FavoriteButton bookId={safeListing.id} initialIsFavorited={initialIsFavorited} variant="text" />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -262,30 +274,12 @@ export default async function BookDetailPage({
                 )}
               </div>
 
+              {/* Action Buttons — always same row, same height */}
               <div className="pt-5 mt-5 border-t border-[#a3b18a]/20">
                 <div className="flex flex-row items-stretch gap-3">
-                  {isOwner ? (
-                    <Link
-                      href={`/book_listing/${safeListing.id}/edit`}
-                      className="flex-1 min-h-[56px] px-5 rounded-full border-2 border-[#bc8a5f] text-[#bc8a5f] hover:bg-[#bc8a5f] hover:text-white font-bold transition-all flex items-center justify-center gap-2"
-                    >
-                      <svg
-                        className="w-5 h-5 shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M16.862 4.487a2.25 2.25 0 113.182 3.182L8.25 19.463 4 20l.537-4.25L16.862 4.487z"
-                        />
-                      </svg>
-                      Edit listing
-                    </Link>
-                  ) : (
+                  {!isOwner && (
                     <>
+                      {/* Borrow — wrapped so it can stretch */}
                       <div className="flex-1">
                         <BorrowModal
                           title={safeListing.title}
@@ -294,6 +288,7 @@ export default async function BookDetailPage({
                         />
                       </div>
 
+                      {/* Send a message */}
                       <form action={startConversation} className="flex-1">
                         <button
                           type="submit"
@@ -318,6 +313,7 @@ export default async function BookDetailPage({
                     </>
                   )}
 
+                  {/* Favorite */}
                   <button className="flex-1 min-h-[56px] px-5 rounded-full border-2 border-[#a3b18a] text-[#5a7d5a] hover:bg-[#a3b18a] hover:text-white font-bold transition-all flex items-center justify-center gap-2">
                     <svg
                       className="w-5 h-5 shrink-0"
@@ -335,7 +331,7 @@ export default async function BookDetailPage({
                     Favorite
                   </button>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
