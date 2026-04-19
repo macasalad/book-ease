@@ -187,22 +187,33 @@ export default async function ConversationPage({
       redirect("/messages");
     }
 
-    await prisma.message.create({
-      data: {
-        conversationId,
-        senderId: currentSession.user.id,
-        content,
-      },
-    });
+    await prisma.$transaction(async (tx) => {
+      await tx.message.create({
+        data: {
+          conversationId,
+          senderId: currentSession.user.id,
+          content,
+        },
+      });
 
-    await prisma.conversationParticipant.updateMany({
-      where: {
-        conversationId,
-        userId: currentSession.user.id,
-      },
-      data: {
-        lastReadAt: new Date(),
-      },
+      await tx.conversation.update({
+        where: {
+          id: conversationId,
+        },
+        data: {
+          lastMessageAt: new Date(),
+        },
+      });
+
+      await tx.conversationParticipant.updateMany({
+        where: {
+          conversationId,
+          userId: currentSession.user.id,
+        },
+        data: {
+          lastReadAt: new Date(),
+        },
+      });
     });
 
     redirect(`/messages/${conversationId}`);
