@@ -14,6 +14,7 @@ export default async function BorrowingPage() {
   if (!session) redirect("/sign-in");
 
   const userId = session.user.id;
+  const now = new Date();
 
   // Fetch active borrow records where current user is the borrower
   const activeBorrows = await prisma.borrowRecord.findMany({
@@ -25,7 +26,7 @@ export default async function BorrowingPage() {
     select: {
       id: true,
       borrowedAt: true,
-      // Removed dueAt and extended here to fix the Prisma error
+      dueAt: true,
       book: { 
         select: { 
           id: true, 
@@ -58,7 +59,8 @@ export default async function BorrowingPage() {
     select: {
       id: true,
       borrowedAt: true,
-      returnedAt: true, // Removed dueAt here as well
+      returnedAt: true,
+      dueAt: true,
       book: { 
         select: { 
           id: true, 
@@ -103,6 +105,29 @@ export default async function BorrowingPage() {
       },
     },
   });
+
+  const getDueStatus = (dueAt: Date | null) => {
+    if (!dueAt) return { text: "No due date", color: "text-[#8a8a8a]" };
+
+    const dueDate = new Date(dueAt);
+    dueDate.setHours(0, 0, 0, 0);
+    
+    const diffTime = dueDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) {
+      return { 
+        text: `Overdue by ${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? 's' : ''}`, 
+        color: "text-red-600 font-bold animate-pulse" 
+      };
+    } else if (diffDays === 0) {
+      return { text: "Due today!", color: "text-orange-600 font-bold" };
+    } else if (diffDays <= 3) {
+      return { text: `Due in ${diffDays} day${diffDays > 1 ? 's' : ''}`, color: "text-amber-600 font-medium" };
+    } else {
+      return { text: `Due in ${diffDays} days`, color: "text-[#5c5c5c]" };
+    }
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] relative font-sans pb-12">
@@ -164,7 +189,29 @@ export default async function BorrowingPage() {
                           </span>
                         </Link>
                       </div>
-                        <p><span className="font-semibold">Borrowed:</span> {new Date(borrow.borrowedAt).toLocaleDateString()}</p>
+                      <div className="space-y-0.5">
+                        <p>
+                          <span className="font-semibold">Borrowed:</span>{" "}
+                          {new Date(borrow.borrowedAt).toLocaleDateString()}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Return by:</span>{" "}
+                          {borrow.dueAt
+                            ? new Date(borrow.dueAt).toLocaleDateString()
+                            : "No due date"}
+                        </p>
+                        <p>
+                        {(() => {
+                          const status = getDueStatus(borrow.dueAt);
+                          return (
+                            <p className={`text-xs ${status.color}`}>
+                              {status.text}
+                            </p>
+                          );
+                        })()}
+                        </p>
+                      </div>
+                      
                       </div>
                     </div>
                     <div className="mt-3">
