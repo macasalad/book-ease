@@ -139,19 +139,7 @@ CREATE TABLE "Message" (
     CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
 );
 
-<<<<<<<< HEAD:prisma/migrations/20260417140329_auth/migration.sql
-========
--- CreateTable
-CREATE TABLE "favorite" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "bookId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "favorite_pkey" PRIMARY KEY ("id")
-);
-
->>>>>>>> favorites:prisma/migrations/20260419103849_add_favorites/migration.sql
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
@@ -170,12 +158,7 @@ CREATE INDEX "verification_identifier_idx" ON "verification"("identifier");
 -- CreateIndex
 CREATE UNIQUE INDEX "ConversationParticipant_conversationId_userId_key" ON "ConversationParticipant"("conversationId", "userId");
 
-<<<<<<<< HEAD:prisma/migrations/20260417140329_auth/migration.sql
-========
--- CreateIndex
-CREATE UNIQUE INDEX "favorite_userId_bookId_key" ON "favorite"("userId", "bookId");
 
->>>>>>>> favorites:prisma/migrations/20260419103849_add_favorites/migration.sql
 -- AddForeignKey
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -211,12 +194,4 @@ ALTER TABLE "Message" ADD CONSTRAINT "Message_conversationId_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-<<<<<<<< HEAD:prisma/migrations/20260417140329_auth/migration.sql
-========
 
--- AddForeignKey
-ALTER TABLE "favorite" ADD CONSTRAINT "favorite_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "favorite" ADD CONSTRAINT "favorite_bookId_fkey" FOREIGN KEY ("bookId") REFERENCES "BookListing"("id") ON DELETE CASCADE ON UPDATE CASCADE;
->>>>>>>> favorites:prisma/migrations/20260419103849_add_favorites/migration.sql
