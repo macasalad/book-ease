@@ -4,8 +4,6 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
-import { SignOutButton } from "../../components/SignOutButton"; 
-
 interface ProfileProps {
   params: Promise<{ id: string }>
 }
