@@ -36,6 +36,7 @@ export default async function LendingPage() {
           id: true,
           title: true,
           photos: true,
+          author: true,
           user: {
             select: {
               id: true,
