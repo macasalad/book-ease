@@ -70,8 +70,9 @@ export async function POST(
         }, { status: 400 });
       }
 
-      const dueDate = new Date();
-      dueDate.setDate(dueDate.getDate() + 7);
+      const dueDate = borrowRequest.returnDate
+      ? new Date(borrowRequest.returnDate)
+      : null;
       
       await prisma.$transaction([
         prisma.borrowRequest.update({ 

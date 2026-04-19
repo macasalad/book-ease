@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import { PrismaClient } from "@prisma/client";
 import ReturnBookButton from "@/components/ReturnBookButton";
 import Link from "next/link";
-import { SignOutButton } from "@/components/SignOutButton";
+import BorrowModal from "../book_listing/components/BorrowModal";
 
 const prisma = new PrismaClient();
 
@@ -107,26 +107,40 @@ export default async function BorrowingPage() {
   });
 
   const getDueStatus = (dueAt: Date | null) => {
-    if (!dueAt) return { text: "No due date", color: "text-[#8a8a8a]" };
-
+    if (!dueAt) return { text: "No due date", color: "text-gray-400" };
+  
+    const now = new Date();
     const dueDate = new Date(dueAt);
+  
+    // normalize BOTH dates
+    now.setHours(0, 0, 0, 0);
     dueDate.setHours(0, 0, 0, 0);
-    
+  
     const diffTime = dueDate.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
+  
     if (diffDays < 0) {
-      return { 
-        text: `Overdue by ${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? 's' : ''}`, 
-        color: "text-red-600 font-bold animate-pulse" 
+      return {
+        text: `Overdue by ${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? "s" : ""}`,
+        color: "text-[#7D1128] font-bold",
       };
-    } else if (diffDays === 0) {
-      return { text: "Due today!", color: "text-orange-600 font-bold" };
-    } else if (diffDays <= 3) {
-      return { text: `Due in ${diffDays} day${diffDays > 1 ? 's' : ''}`, color: "text-amber-600 font-medium" };
-    } else {
-      return { text: `Due in ${diffDays} days`, color: "text-[#5c5c5c]" };
     }
+  
+    if (diffDays === 0) {
+      return { text: "Due today", color: "text-orange-600 font-bold" };
+    }
+  
+    if (diffDays <= 3) {
+      return {
+        text: `Due in ${diffDays} day${diffDays > 1 ? "s" : ""}`,
+        color: "text-amber-600 font-medium",
+      };
+    }
+  
+    return {
+      text: `Due in ${diffDays} days`,
+      color: "text-[#5a7d5a] font-medium",
+    };
   };
 
   return (
@@ -200,22 +214,22 @@ export default async function BorrowingPage() {
                             ? new Date(borrow.dueAt).toLocaleDateString()
                             : "No due date"}
                         </p>
-                        <p>
+
                         {(() => {
                           const status = getDueStatus(borrow.dueAt);
+
                           return (
                             <p className={`text-xs ${status.color}`}>
                               {status.text}
                             </p>
                           );
                         })()}
-                        </p>
                       </div>
                       
                       </div>
                     </div>
                     <div className="mt-3">
-                      <ReturnBookButton borrowId={borrow.id} bookId={borrow.book.id} />
+                      <ReturnBookButton borrowId={borrow.id} bookId={borrow.book.id}/>
                     </div>
                   </div>
                 </div>

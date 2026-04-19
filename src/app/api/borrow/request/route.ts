@@ -56,7 +56,7 @@ export async function POST(req: Request) {
         borrowerId: session.user.id,
         lenderId,
         bookId,
-        returnDate: new Date(returnDate),
+        returnDate: new Date(returnDate + "T00:00:00Z"),
         status: "PENDING"
       }
     });
