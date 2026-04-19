@@ -144,6 +144,8 @@ model BorrowRequest {
   borrowDate DateTime?
   returnDate DateTime?
 
+  requestType String
+
   createdAt DateTime @default(now())
 }
 
