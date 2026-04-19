@@ -138,7 +138,7 @@ export default async function BookDetailPage({
       <div className="mx-auto max-w-7xl relative z-10">
         <div className="mb-4 ml-2">
           <Link
-            href="/book_listing"
+            href="/dashboard"
             className="inline-flex items-center gap-2 text-[#8a8a8a] hover:text-[#bc8a5f] transition-colors font-medium"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,7 +149,7 @@ export default async function BookDetailPage({
                 d="M10 19l-7-7m0 0l7-7m-7 7h18"
               />
             </svg>
-            Back to Listings
+            Back to Catalog
           </Link>
         </div>
 

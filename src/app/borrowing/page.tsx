@@ -303,7 +303,7 @@ export default async function BorrowingPage() {
                       <h3 className="text-lg font-bold text-[#4a4a4a] leading-tight">{borrow.book.title}</h3>
                       <p className="text-sm text-[#8a8a8a]">by {borrow.book.author}</p>
                       <div className="mt-2 text-sm text-[#5c5c5c] space-y-0.5">
-                        <p><span className="font-semibold">From:
+                        <p><span className="font-semibold">From:</span>
                         <Link
                           href={`/profile/${borrow.book.user.id}`}
                           className="flex items-center gap-2 hover:text-[#bc8a5f] transition-colors"
@@ -321,8 +321,7 @@ export default async function BorrowingPage() {
                           <span className="font-medium">
                             {borrow.book.user.name}
                           </span>
-                        </Link>
-                        </span></p>
+                        </Link></p>
                         <p><span className="font-semibold">Borrowed:</span> {new Date(borrow.borrowedAt).toLocaleDateString()}
                         <span className="font-semibold"> Returned:</span> {new Date(borrow.returnedAt!).toLocaleDateString()} </p>
 
