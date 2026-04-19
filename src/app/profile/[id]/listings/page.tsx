@@ -77,7 +77,7 @@ export default async function UserListings({ params }: ListingsProps) {
       <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
         
         {/* Header Section */}
-        <div className="flex justify-between items-end mb-10 border-b border-[#a3b18a]/30 pb-6">
+        <div className="flex justify-between items-end mb-6 border-b border-[#a3b18a]/30 pb-6">
           <div>
 
             <h1 className="text-4xl font-bold tracking-tight text-[#4a4a4a]">
@@ -103,7 +103,7 @@ export default async function UserListings({ params }: ListingsProps) {
         {userListings.length === 0 ? (
           <div className="w-full py-20 flex flex-col items-center justify-center bg-white/40 backdrop-blur-md rounded-3xl border border-white/60 shadow-xl shadow-stone-200/50">
             <div className="text-[#a3b18a] text-6xl mb-4">📚</div>
-            <h3 className="text-xl font-bold text-[#4a4a4a] mb-2">No listings found</h3>
+            <h3 className="text-xl font-bold text-[#4a4a4a] mb-4">No listings found</h3>
             <p className="text-[#8a8a8a] text-center max-w-md">
               {isOwnListings 
                 ? "You haven't listed any books yet. Add your first book to start sharing with the community!" 

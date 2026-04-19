@@ -67,7 +67,7 @@ export default async function Dashboard({
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#bc8a5f]/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
-        <div className="flex justify-between items-end mb-10 border-b border-[#a3b18a]/30 pb-6">
+        <div className="flex justify-between items-end mb-6 border-b border-[#a3b18a]/30 pb-6">
           <div>
             <h1 className="text-4xl font-bold tracking-tight text-[#4a4a4a]">Book Catalog</h1>
             <p className="text-[#8a8a8a] mt-2 font-medium">
