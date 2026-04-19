@@ -232,16 +232,14 @@ export default async function BorrowingPage() {
                       
                       </div>
                     </div>
-                    <div className="mt-3">
-                      <ReturnBookButton borrowId={borrow.id} bookId={borrow.book.id}/>
-                    </div>
-                    <div className="mt-3">
-                      <ExtendBorrowModal
-                        borrowId={borrow.id}
-                        bookId={borrow.book.id}
-                        lenderId={borrow.book.user.id}
-                        currentDueAt={borrow.dueAt}
-                      />
+                    <div className="mt-4 flex gap-2">
+                        <ReturnBookButton borrowId={borrow.id} bookId={borrow.book.id} />
+                        <ExtendBorrowModal
+                          borrowId={borrow.id}
+                          bookId={borrow.book.id}
+                          lenderId={borrow.book.user.id}
+                          currentDueAt={borrow.dueAt}
+                        />
                     </div>
                   </div>
                 </div>
