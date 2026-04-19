@@ -15,7 +15,7 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    let requestId;
+    let requestId: string | undefined;
     
     if (params && params.requestId) {
       requestId = params.requestId;
@@ -61,36 +61,53 @@ export async function POST(
     if (action === "APPROVED") {
       const book = await prisma.bookListing.findUnique({
         where: { id: borrowRequest.bookId },
-        select: { status: true }
+        select: { 
+          status: true,
+          borrowRecords: {
+            where: { returnedAt: null },
+            select: { id: true, borrowerId: true }
+          }
+        }
       });
       
-      if (book?.status !== "AVAILABLE") {
+      const activeRecord = book?.borrowRecords.find(
+        record => record.borrowerId === borrowRequest.borrowerId
+      );
+
+      if (book?.status !== "AVAILABLE" && !activeRecord) {
         return NextResponse.json({ 
           error: "Book is no longer available" 
         }, { status: 400 });
       }
 
-      const dueDate = borrowRequest.returnDate
-      ? new Date(borrowRequest.returnDate)
-      : null;
+      const newDueDate = borrowRequest.returnDate ? new Date(borrowRequest.returnDate) : null;
       
-      await prisma.$transaction([
-        prisma.borrowRequest.update({ 
+      await prisma.$transaction(async (tx) => {
+        await tx.borrowRequest.update({ 
           where: { id: requestId }, 
           data: { status: "APPROVED" } 
-        }),
-        prisma.bookListing.update({ 
+        });
+
+        await tx.bookListing.update({ 
           where: { id: borrowRequest.bookId }, 
           data: { status: "BORROWED" } 
-        }),
-        prisma.borrowRecord.create({ 
-          data: { 
-            borrowerId: borrowRequest.borrowerId, 
-            bookId: borrowRequest.bookId,
-            dueAt: dueDate
-          } 
-        }),
-      ]);
+        });
+
+        if (activeRecord) {
+          await tx.borrowRecord.update({
+            where: { id: activeRecord.id },
+            data: { dueAt: newDueDate },
+          });
+        } else {
+          await tx.borrowRecord.create({
+            data: {
+              borrowerId: borrowRequest.borrowerId,
+              bookId: borrowRequest.bookId,
+              dueAt: newDueDate,
+            },
+          });
+        }
+      });
     } else {
       await prisma.borrowRequest.update({ 
         where: { id: requestId }, 

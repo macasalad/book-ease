@@ -8,11 +8,74 @@ const prisma = new PrismaClient();
 export async function POST(req: Request) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
+
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { bookId, lenderId, borrowDate, returnDate } = await req.json();
+    const body = await req.json();
+
+    const {
+      bookId,
+      lenderId,
+      borrowDate,
+      returnDate,
+      borrowId,
+      requestType,
+    } = body;
+
+    if (requestType === "EXTEND") {
+      if (!bookId || !lenderId || !returnDate) {
+        return NextResponse.json(
+          { error: "Missing required fields for extension" },
+          { status: 400 }
+        );
+      }
+    
+      const borrowRecord = await prisma.borrowRecord.findFirst({
+        where: {
+          bookId,
+          borrowerId: session.user.id,
+          returnedAt: null,
+        },
+      });
+    
+      if (!borrowRecord) {
+        return NextResponse.json(
+          { error: "Active borrow not found" },
+          { status: 404 }
+        );
+      }
+    
+      const existingRequest = await prisma.borrowRequest.findFirst({
+        where: {
+          bookId,
+          borrowerId: session.user.id,
+          status: "PENDING",
+          requestType: "EXTEND",
+        },
+      });
+    
+      if (existingRequest) {
+        return NextResponse.json(
+          { error: "Extension already pending" },
+          { status: 400 }
+        );
+      }
+    
+      const request = await prisma.borrowRequest.create({
+        data: {
+          borrowerId: session.user.id,
+          lenderId,
+          bookId,
+          returnDate: new Date(returnDate),
+          requestType: "EXTEND",
+          status: "PENDING",
+        },
+      });
+    
+      return NextResponse.json({ success: true, request }, { status: 201 });
+    }
 
     if (!bookId || !lenderId || !borrowDate || !returnDate) {
       return NextResponse.json(
@@ -23,7 +86,7 @@ export async function POST(req: Request) {
 
     const book = await prisma.bookListing.findUnique({
       where: { id: bookId },
-      select: { status: true, userId: true }
+      select: { status: true, userId: true },
     });
 
     if (!book) {
@@ -31,24 +94,32 @@ export async function POST(req: Request) {
     }
 
     if (book.status !== "AVAILABLE") {
-      return NextResponse.json({ error: "Book is not available" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Book is not available" },
+        { status: 400 }
+      );
     }
 
     if (book.userId === session.user.id) {
-      return NextResponse.json({ error: "Cannot borrow your own book" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Cannot borrow your own book" },
+        { status: 400 }
+      );
     }
 
-    // Check for existing pending request
     const existingRequest = await prisma.borrowRequest.findFirst({
       where: {
         bookId,
         borrowerId: session.user.id,
-        status: "PENDING"
-      }
+        status: "PENDING",
+      },
     });
 
     if (existingRequest) {
-      return NextResponse.json({ error: "You already have a pending request for this book" }, { status: 400 });
+      return NextResponse.json(
+        { error: "You already have a pending request for this book" },
+        { status: 400 }
+      );
     }
 
     const borrowRequest = await prisma.borrowRequest.create({
@@ -56,15 +127,17 @@ export async function POST(req: Request) {
         borrowerId: session.user.id,
         lenderId,
         bookId,
-        returnDate: new Date(returnDate + "T00:00:00Z"),
-        status: "PENDING"
-      }
+        borrowDate: new Date(borrowDate),
+        returnDate: new Date(returnDate),
+        requestType: "BORROW",
+        status: "PENDING",
+      },
     });
 
-    return NextResponse.json({ 
-      success: true, 
-      request: borrowRequest 
-    }, { status: 201 });
+    return NextResponse.json(
+      { success: true, request: borrowRequest },
+      { status: 201 }
+    );
 
   } catch (error) {
     console.error("Error creating borrow request:", error);

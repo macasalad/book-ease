@@ -1,11 +1,10 @@
-// app/borrowing/page.tsx
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { PrismaClient } from "@prisma/client";
 import ReturnBookButton from "@/components/ReturnBookButton";
 import Link from "next/link";
-import BorrowModal from "../book_listing/components/BorrowModal";
+import ExtendBorrowModal from "@/components/ExtendBorrowModal";
 
 const prisma = new PrismaClient();
 
@@ -16,11 +15,10 @@ export default async function BorrowingPage() {
   const userId = session.user.id;
   const now = new Date();
 
-  // Fetch active borrow records where current user is the borrower
   const activeBorrows = await prisma.borrowRecord.findMany({
     where: { 
       borrowerId: userId,
-      returnedAt: null // Only currently borrowed books
+      returnedAt: null
     },
     orderBy: { borrowedAt: "desc" },
     select: {
@@ -48,14 +46,13 @@ export default async function BorrowingPage() {
     },
   });
 
-  // Fetch borrowing history (returned books)
   const borrowHistory = await prisma.borrowRecord.findMany({
     where: { 
       borrowerId: userId,
       NOT: { returnedAt: null }
     },
     orderBy: { returnedAt: "desc" },
-    take: 10, // Limit history to last 10
+    take: 10,
     select: {
       id: true,
       borrowedAt: true,
@@ -81,7 +78,6 @@ export default async function BorrowingPage() {
     },
   });
 
-  // Fetch pending requests made by this user
   const pendingRequests = await prisma.borrowRequest.findMany({
     where: { 
       borrowerId: userId,
@@ -112,7 +108,6 @@ export default async function BorrowingPage() {
     const now = new Date();
     const dueDate = new Date(dueAt);
   
-    // normalize BOTH dates
     now.setHours(0, 0, 0, 0);
     dueDate.setHours(0, 0, 0, 0);
   
@@ -127,7 +122,7 @@ export default async function BorrowingPage() {
     }
   
     if (diffDays === 0) {
-      return { text: "Due today", color: "text-orange-600 font-bold" };
+      return { text: "Due today", color: "text-[#7D1128] font-bold" };
     }
   
     if (diffDays <= 3) {
@@ -230,6 +225,14 @@ export default async function BorrowingPage() {
                     </div>
                     <div className="mt-3">
                       <ReturnBookButton borrowId={borrow.id} bookId={borrow.book.id}/>
+                    </div>
+                    <div className="mt-3">
+                      <ExtendBorrowModal
+                        borrowId={borrow.id}
+                        bookId={borrow.book.id}
+                        lenderId={borrow.book.user.id}
+                        currentDueAt={borrow.dueAt}
+                      />
                     </div>
                   </div>
                 </div>
