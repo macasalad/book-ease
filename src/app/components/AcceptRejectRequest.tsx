@@ -54,7 +54,7 @@ export default function AcceptRejectRequest({
 
   return (
     <Link
-      href={`/profile/${request.borrower.id}`}
+      href={`/book_listing/${request.book.id}`}
     >
       <div className="bg-white/40 border border-white/60 rounded-[1.5rem] p-5 shadow-lg shadow-stone-200/30 backdrop-blur-md hover:bg-white/60 transition-all flex gap-5">
       
