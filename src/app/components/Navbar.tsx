@@ -47,54 +47,58 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-[#a3b18a]/20 bg-white/20 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-[15px] font-medium">
+    <nav className="sticky top-0 z-50 w-full border-b border-[#a3b18a]/30 bg-white/60 backdrop-blur-xl shadow-sm">
+      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between text-[15px] font-medium">
         
-        <div className="flex space-x-10 items-center text-[#8a8a8a]">
+        <div className="flex items-center lg:gap-8 gap-4 text-[#8a8a8a]">
           
-          <Link href="/dashboard" className="text-xl font-extrabold tracking-tight text-[#4a4a4a] hover:opacity-80 transition-opacity">
+          <Link href="/dashboard" className="text-2xl font-extrabold tracking-tight text-[#4a4a4a] hover:opacity-80 transition-opacity mr-4">
             Book<span className="text-[#bc8a5f]">Ease</span>
           </Link>
 
-          <Link href="/dashboard" className="hover:text-[#bc8a5f] transition-colors">
-            Home
-          </Link>
-          <Link href="/book_listing" className="hover:text-[#bc8a5f] transition-colors">
-            My Listing
-          </Link>
-          <Link href="/profile/favorites" className="hover:text-[#bc8a5f] transition-colors">
-            Favorites
-          </Link>
-          <Link href="/borrowing" className="hover:text-[#bc8a5f] transition-colors">
-            Borrowing
-          </Link>
-          <Link href="/lending" className="hover:text-[#bc8a5f] transition-colors">
-            Lending
-          </Link>
-          <Link
-            href="/messages"
-            className="relative hover:text-[#bc8a5f] transition-colors font-medium"
-          >
-            Messages
-            {unreadCount > 0 && (
-              <span className="absolute -top-2 -right-5 inline-flex min-w-[20px] h-5 px-1 items-center justify-center rounded-full bg-[#bc8a5f] text-white text-[11px] font-bold leading-none">
-                {unreadCount}
-              </span>
-            )}
-          </Link>
+          <div className="flex items-center gap-1">
+            <Link href="/dashboard" className="px-4 py-2 rounded-full hover:bg-white/80 hover:text-[#bc8a5f] hover:shadow-sm transition-all duration-300 font-bold">
+              Home
+            </Link>
+            <Link href="/book_listing" className="px-4 py-2 rounded-full hover:bg-white/80 hover:text-[#bc8a5f] hover:shadow-sm transition-all duration-300 font-bold">
+              Listing
+            </Link>
+            <Link href="/profile/favorites" className="px-4 py-2 rounded-full hover:bg-white/80 hover:text-[#bc8a5f] hover:shadow-sm transition-all duration-300 font-bold">
+              Favorites
+            </Link>
+            <Link href="/borrowing" className="px-4 py-2 rounded-full hover:bg-white/80 hover:text-[#bc8a5f] hover:shadow-sm transition-all duration-300 font-bold">
+              Borrowing
+            </Link>
+            <Link href="/lending" className="px-4 py-2 rounded-full hover:bg-white/80 hover:text-[#bc8a5f] hover:shadow-sm transition-all duration-300 font-bold">
+              Lending
+            </Link>
+            <Link
+              href="/messages"
+              className="relative px-4 py-2 rounded-full hover:bg-white/80 hover:text-[#bc8a5f] hover:shadow-sm transition-all duration-300 font-bold"
+            >
+              Messages
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-[#bc8a5f] text-white text-[10px] font-bold shadow-sm ring-2 ring-white">
+                  {unreadCount}
+                </span>
+              )}
+            </Link>
+          </div>
         </div>
 
-        <div className="flex space-x-8 items-center">
+        <div className="flex items-center gap-4">
           <Link
             href="/profile"
-            className="hover:text-[#bc8a5f] transition-colors font-bold"
+            className="px-4 py-2 rounded-full text-[#4a4a4a] hover:bg-white/80 hover:text-[#bc8a5f] hover:shadow-sm transition-all duration-300 font-bold"
           >
             My Account
           </Link>
-          <div className="opacity-80 hover:opacity-100 transition-opacity">
+          
+          <div className="px-4 py-2 rounded-full text-[#4a4a4a] hover:bg-white/80 hover:text-[#bc8a5f] hover:shadow-sm transition-all duration-300 font-bold">
             <SignOutButton />
           </div>
         </div>
+
       </div>
     </nav>
   );
