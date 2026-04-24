@@ -4,6 +4,9 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { BookListing } from "@prisma/client";
+import PageContainer from "@/app/components/PageContainer";
+import PageHeader from "@/app/components/PageHeader";
+import BookCard from "@/app/components/BookCard";
 
 export const dynamic = 'force-dynamic';
 
@@ -56,10 +59,12 @@ export default async function UserListings({ params }: ListingsProps) {
   
   if (!res.ok) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f2ece4] text-[#4a4a4a]">
-        <h2 className="text-2xl font-bold mb-2">Oops!</h2>
-        <p className="text-red-500">Failed to load listings. Check the server console.</p>
-      </div>
+      <PageContainer>
+        <div className="flex flex-col items-center justify-center py-20">
+          <h2 className="text-2xl font-bold mb-2 text-[#4a4a4a]">Oops!</h2>
+          <p className="text-red-500">Failed to load listings. Check the server console.</p>
+        </div>
+      </PageContainer>
     );
   }
 
@@ -68,99 +73,46 @@ export default async function UserListings({ params }: ListingsProps) {
 
   const availableCount = userListings.filter((book) => !book.isBorrowed).length;
 
+  const headerRight = isOwnListings ? (
+    <Link 
+      href="/book_listing/new_book" 
+      className="px-6 py-2.5 bg-[#bc8a5f] hover:bg-[#a47148] text-white font-bold rounded-full transition-all shadow-lg shadow-[#bc8a5f]/20 active:scale-95"
+    >
+      + Add New Book
+    </Link>
+  ) : undefined;
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#f2ece4] via-[#e2d9c8] to-[#d4e2d4] text-[#4a4a4a] overflow-x-hidden relative font-sans">
-      {/* Background Decorative Circles */}
-      <div className="absolute top-20 left-10 w-72 h-72 bg-[#a3b18a]/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#bc8a5f]/10 rounded-full blur-[120px] pointer-events-none" />
+    <PageContainer>
+      <PageHeader 
+        title={isOwnListings ? "My Book Listings" : `${profileUser.name || "User"}'s Listings`}
+        subtitle={`${availableCount} ${availableCount === 1 ? 'book' : 'books'} available`}
+        rightContent={headerRight}
+      />
 
-      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
-        
-        {/* Header Section */}
-        <div className="flex justify-between items-end mb-6 border-b border-[#a3b18a]/30 pb-6">
-          <div>
-
-            <h1 className="text-4xl font-bold tracking-tight text-[#4a4a4a]">
-              {isOwnListings ? "My Book Listings" : `${profileUser.name || "User"}'s Listings`}
-            </h1>
-            <p className="text-[#8a8a8a] mt-2 font-medium">
-            {availableCount} {availableCount === 1 ? 'book' : 'books'} available
-            </p>
-          </div>
-
-          {/* Only show "Add New Listing" if it's their own page */}
-          {isOwnListings && (
-            <Link 
-              href="/book_listing/new_book" 
-              className="px-6 py-2.5 bg-[#bc8a5f] hover:bg-[#a47148] text-white font-bold rounded-full transition-all shadow-lg shadow-[#bc8a5f]/20 active:scale-95"
-            >
-              + Add New Book
-            </Link>
-          )}
+      {userListings.length === 0 ? (
+        <div className="w-full py-20 flex flex-col items-center justify-center bg-white/40 backdrop-blur-md rounded-3xl border border-white/60 shadow-xl shadow-stone-200/50">
+          <div className="text-[#a3b18a] text-6xl mb-4">📚</div>
+          <h3 className="text-xl font-bold text-[#4a4a4a] mb-4">No listings found</h3>
+          <p className="text-[#8a8a8a] text-center max-w-md">
+            {isOwnListings 
+              ? "You haven't listed any books yet. Add your first book to start sharing with the community!" 
+              : "This user hasn't listed any books yet. Check back later!"}
+          </p>
         </div>
-
-        {/* Listings Grid */}
-        {userListings.length === 0 ? (
-          <div className="w-full py-20 flex flex-col items-center justify-center bg-white/40 backdrop-blur-md rounded-3xl border border-white/60 shadow-xl shadow-stone-200/50">
-            <div className="text-[#a3b18a] text-6xl mb-4">📚</div>
-            <h3 className="text-xl font-bold text-[#4a4a4a] mb-4">No listings found</h3>
-            <p className="text-[#8a8a8a] text-center max-w-md">
-              {isOwnListings 
-                ? "You haven't listed any books yet. Add your first book to start sharing with the community!" 
-                : "This user hasn't listed any books yet. Check back later!"}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-            {userListings.map((book) => (
-              <Link
-                key={book.id}
-                href={`/book_listing/${book.id}`}
-                className="group flex flex-col bg-white/40 border border-white/60 rounded-[1.5rem] p-4 hover:bg-white/60 hover:shadow-xl hover:shadow-[#bc8a5f]/20 transition-all backdrop-blur-md shadow-lg shadow-stone-200/30"
-              >
-                <div className="aspect-[3/4] w-full bg-[#e2d9c8]/50 rounded-xl overflow-hidden shadow-inner relative flex items-center justify-center border border-white/40 mb-4">
-                  {book.photos && book.photos[0] ? (
-                    <img
-                      src={book.photos[0]}
-                      alt={book.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <span className="text-4xl opacity-50">📖</span>
-                  )}
-                </div>
-
-                <div className="flex flex-col flex-1 justify-between">
-                  <div>
-                    <h3 className="text-lg font-bold text-[#4a4a4a] group-hover:text-[#bc8a5f] transition-colors line-clamp-1">
-                      {book.title}
-                    </h3>
-                    <p className="text-sm text-[#8a8a8a] line-clamp-1 mt-1">
-                      {book.author || "Unknown Author"}
-                    </p>
-                  </div>
-
-                  <div className="mt-4 inline-block px-3 py-1.5 bg-[#a3b18a]/20 text-[#5a7d5a] text-xs font-bold uppercase tracking-wider rounded-full w-max">
-                    {book.condition ? book.condition.replace("_", " ") : "Available"}
-                  </div>
-                </div>
-
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  {book.isBorrowed ? (
-                    <span className="px-3 py-1.5 bg-[#a3b18a]/20 text-[#7D1128] text-xs font-bold uppercase tracking-wider rounded-full shadow-sm">
-                      Borrowed
-                    </span>
-                  ) : (
-                    <span className="px-3 py-1.5 bg-[#a3b18a]/20 text-[#5a7d5a] text-xs font-bold uppercase tracking-wider rounded-full shadow-sm">
-                      Available
-                    </span>
-                  )}
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-    </main>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+          {userListings.map((book) => (
+            <BookCard 
+              key={book.id} 
+              book={{
+                ...book,
+                isBorrowed: book.isBorrowed
+              }} 
+            />
+          ))}
+        </div>
+      )}
+    </PageContainer>
   );
-}
+}
