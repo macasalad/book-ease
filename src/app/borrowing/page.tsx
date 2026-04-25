@@ -169,9 +169,9 @@ export default async function BorrowingPage() {
           </h2>
 
           {activeBorrows.length === 0 ? (
-            <p className="text-[#8a8a8a] bg-white/40 border border-white/60 p-6 rounded-[1.5rem] shadow-sm backdrop-blur-md">
-              You haven't borrowed any books yet.
-            </p>
+            <div className="bg-white/40 border border-white/60 p-8 rounded-[1.5rem] shadow-sm backdrop-blur-md text-center">
+              <p className="text-[#8a8a8a]">You haven't borrowed any books yet.</p>
+            </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {activeBorrows.map((borrow) => (

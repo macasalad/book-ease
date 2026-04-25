@@ -63,7 +63,11 @@ export default function Navbar() {
             <Link href="/book_listing" className="px-4 py-2 rounded-full hover:bg-white/80 hover:text-[#bc8a5f] hover:shadow-sm transition-all duration-300 font-bold">
               Listing
             </Link>
+<<<<<<< HEAD
             <Link href="/favorites" className="px-4 py-2 rounded-full hover:bg-white/80 hover:text-[#bc8a5f] hover:shadow-sm transition-all duration-300 font-bold">
+=======
+            <Link href="/profile/favorites" className="px-4 py-2 rounded-full hover:bg-white/80 hover:text-[#bc8a5f] hover:shadow-sm transition-all duration-300 font-bold">
+>>>>>>> f27dc47fbc561ae94ff31e45c3d459e215427ae3
               Favorites
             </Link>
             <Link href="/borrowing" className="px-4 py-2 rounded-full hover:bg-white/80 hover:text-[#bc8a5f] hover:shadow-sm transition-all duration-300 font-bold">
