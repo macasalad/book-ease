@@ -1,9 +1,10 @@
+
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { auth } from "../../../../auth";
+import { auth } from "../../../auth";
 import { headers } from "next/headers";
 import { PrismaClient } from "@prisma/client";
-import FavoriteButton from "../../components/FavoriteButton";
+import FavoriteButton from "../components/FavoriteButton";
 
 const prisma = new PrismaClient();
 
@@ -43,7 +44,7 @@ export default async function FavoritesPage() {
     </div>
 
         {favorites.length === 0 ? (
-          <div className="mt-12 rounded-[1.5rem] border border-white/60 bg-white/40 p-12 text-center backdrop-blur-md shadow-lg shadow-stone-200/30 w-full">
+          <div className="w-full py-20 flex flex-col items-center justify-center bg-white/40 backdrop-blur-md rounded-3xl border border-white/60 shadow-xl shadow-stone-200/50">
             <span className="text-6xl mb-6 block">📚</span>
             <p className="text-xl font-semibold text-[#4a4a4a] mb-2">
               You haven't liked any books yet.
