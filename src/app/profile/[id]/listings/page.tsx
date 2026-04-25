@@ -115,4 +115,4 @@ export default async function UserListings({ params }: ListingsProps) {
       )}
     </PageContainer>
   );
-}
+}

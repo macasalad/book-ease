@@ -169,9 +169,21 @@ export default async function BorrowingPage() {
           </h2>
 
           {activeBorrows.length === 0 ? (
-            <div className="bg-white/40 border border-white/60 p-8 rounded-[1.5rem] shadow-sm backdrop-blur-md text-center">
-              <p className="text-[#8a8a8a]">You haven't borrowed any books yet.</p>
-            </div>
+            <div className="w-full py-20 flex flex-col items-center justify-center bg-white/40 backdrop-blur-md rounded-3xl border border-white/60 shadow-xl shadow-stone-200/50">
+            <span className="text-6xl mb-6 block">📚</span>
+            <p className="text-xl font-semibold text-[#4a4a4a] mb-2">
+              You haven't borrowed any books yet.
+            </p>
+            <p className="text-[#8a8a8a] mb-6">
+              Browse the catalog to see books that you can borrow.
+            </p>
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center justify-center px-6 py-3 bg-[#bc8a5f] hover:bg-[#a47148] text-white font-bold rounded-full transition-all shadow-lg shadow-[#bc8a5f]/20"
+            >
+              Browse Catalog
+            </Link>
+          </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {activeBorrows.map((borrow) => (
