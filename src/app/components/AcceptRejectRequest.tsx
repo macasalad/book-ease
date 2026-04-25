@@ -53,7 +53,10 @@ export default function AcceptRejectRequest({
   }
 
   return (
-    <div className="bg-white/40 border border-white/60 rounded-[1.5rem] p-5 shadow-lg shadow-stone-200/30 backdrop-blur-md hover:bg-white/60 transition-all flex gap-5">
+    <Link
+      href={`/book_listing/${request.book.id}`}
+    >
+      <div className="bg-white/40 border border-white/60 rounded-[1.5rem] p-5 shadow-lg shadow-stone-200/30 backdrop-blur-md hover:bg-white/60 transition-all flex gap-5">
       
       {/* BOOK IMAGE */}
       <div className="w-24 h-full min-h-[160px] rounded-xl overflow-hidden border border-white/50 bg-[#e2d9c8]/50 shrink-0 flex items-center justify-center">
@@ -100,7 +103,7 @@ export default function AcceptRejectRequest({
                   className="w-6 h-6 rounded-full object-cover border border-white/60"
                   alt={request.borrower.name}
                 />
-                <span className="font-medium text-[#4a4a4a]">
+                <span className="font-medium">
                   {request.borrower.name}
                 </span>
               </Link>
@@ -162,5 +165,7 @@ export default function AcceptRejectRequest({
         )}
       </div>
     </div>
+    
+    </Link>
   );
 }

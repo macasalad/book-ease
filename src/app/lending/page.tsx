@@ -74,9 +74,21 @@ export default async function LendingPage() {
           </h2>
 
           {requests.length === 0 ? (
-            <div className="bg-white/40 border border-white/60 p-8 rounded-[1.5rem] shadow-sm backdrop-blur-md text-center">
-              <p className="text-[#8a8a8a]">You don't have any borrow requests yet.</p>
-            </div>
+            <div className="w-full py-20 flex flex-col items-center justify-center bg-white/40 backdrop-blur-md rounded-3xl border border-white/60 shadow-xl shadow-stone-200/50">
+            <span className="text-6xl mb-6 block">📚</span>
+            <p className="text-xl font-semibold text-[#4a4a4a] mb-2">
+              You haven't received any borrow requests yet.
+            </p>
+            <p className="text-[#8a8a8a] mb-6">
+              List more books other users can borrow.
+            </p>
+            <Link
+              href="/book_listing/new_book"
+              className="inline-flex items-center justify-center px-6 py-3 bg-[#bc8a5f] hover:bg-[#a47148] text-white font-bold rounded-full transition-all shadow-lg shadow-[#bc8a5f]/20"
+            >
+              List a Book
+            </Link>
+          </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {requests.map((req) => (
