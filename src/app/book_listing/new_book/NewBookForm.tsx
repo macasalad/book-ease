@@ -320,28 +320,44 @@ export default function NewBookForm({
   }
 
   function onFilesSelected(files: FileList | null) {
-    if (!files) return;
+  if (!files) return;
 
-    const validFiles: File[] = [];
-    let hasOversized = false;
-    const MAX_SIZE = 5 * 1024 * 1024;
+  const validFiles: File[] = [];
+  let hasOversized = false;
+  const MAX_SIZE = 5 * 1024 * 1024;
 
-    Array.from(files).forEach((file) => {
-      if (file.size > MAX_SIZE) {
-        hasOversized = true;
-      } else {
-        validFiles.push(file);
-      }
-    });
-
-    if (hasOversized) {
-      setError("One or more files exceeded the 5MB limit and were skipped.");
+  Array.from(files).forEach((file) => {
+    if (file.size > MAX_SIZE) {
+      hasOversized = true;
     } else {
-      setError(null);
+      validFiles.push(file);
     }
+  });
 
-    setForm((prev) => ({ ...prev, photos: validFiles }));
+  if (hasOversized) {
+    setError("One or more files exceeded the 5MB limit and were skipped.");
+  } else {
+    setError(null);
   }
+
+  setForm((prev) => {
+    const merged = [...prev.photos, ...validFiles];
+    const unique = merged.filter(
+      (file, index, self) =>
+        self.findIndex(
+          (f) =>
+            f.name === file.name &&
+            f.size === file.size &&
+            f.lastModified === file.lastModified
+        ) === index
+    );
+
+    return {
+      ...prev,
+      photos: unique,
+    };
+  });
+}
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
