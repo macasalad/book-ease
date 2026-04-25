@@ -5,9 +5,10 @@ import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
+
 export async function POST(
   request: Request,
-  { params }: { params: { requestId: string } }
+  { params }: { params: Promise<{ id: string }> } 
 ) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
@@ -15,28 +16,12 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    let requestId: string | undefined;
-    
-    if (params && params.requestId) {
-      requestId = params.requestId;
-    } 
-    else {
-      const url = new URL(request.url);
-      const pathParts = url.pathname.split('/');
-      const requestIdIndex = pathParts.indexOf('borrow') + 1;
-      if (requestIdIndex < pathParts.length) {
-        requestId = pathParts[requestIdIndex];
-      }
-    }
-    
-    console.log("Extracted requestId:", requestId);
-    console.log("Params object:", params);
-    console.log("Full URL:", request.url);
+    // Await the params to extract the ID
+    const { id: requestId } = await params;
 
     if (!requestId) {
       return NextResponse.json({ 
-        error: "Request ID is required",
-        debug: { params, url: request.url }
+        error: "Request ID is required"
       }, { status: 400 });
     }
 
