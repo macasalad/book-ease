@@ -342,7 +342,23 @@ export default function NewBookForm({
       setError(null);
     }
 
-    setForm((prev) => ({ ...prev, photos: validFiles }));
+    setForm((prev) => {
+      const merged = [...prev.photos, ...validFiles];
+      const unique = merged.filter(
+        (file, index, self) =>
+          self.findIndex(
+            (f) =>
+              f.name === file.name &&
+              f.size === file.size &&
+              f.lastModified === file.lastModified
+          ) === index
+      );
+
+      return {
+        ...prev,
+        photos: unique,
+      };
+    });
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
