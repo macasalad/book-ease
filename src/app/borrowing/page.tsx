@@ -169,103 +169,98 @@ export default async function BorrowingPage() {
           </h2>
 
           {activeBorrows.length === 0 ? (
-            <div className="w-full py-20 flex flex-col items-center justify-center bg-white/40 backdrop-blur-md rounded-3xl border border-white/60 shadow-xl shadow-stone-200/50">
-            <span className="text-6xl mb-6 block">📚</span>
-            <p className="text-xl font-semibold text-[#4a4a4a] mb-2">
-              You haven't borrowed any books yet.
-            </p>
-            <p className="text-[#8a8a8a] mb-6">
-              Browse the catalog to see books that you can borrow.
-            </p>
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center justify-center px-6 py-3 bg-[#bc8a5f] hover:bg-[#a47148] text-white font-bold rounded-full transition-all shadow-lg shadow-[#bc8a5f]/20"
-            >
-              Browse Catalog
-            </Link>
-          </div>
-          ) : (
+              <div className="w-full py-20 flex flex-col items-center justify-center bg-white/40 backdrop-blur-md rounded-3xl border border-white/60 shadow-xl shadow-stone-200/50">
+              <span className="text-6xl mb-6 block">📚</span>
+              <p className="text-xl font-semibold text-[#4a4a4a] mb-2">
+                You haven't received any borrow requests yet.
+              </p>
+              <p className="text-[#8a8a8a] mb-6">
+                List more books other users can borrow.
+              </p>
+              <Link
+                href="/book_listing/new_book"
+                className="inline-flex items-center justify-center px-6 py-3 bg-[#bc8a5f] hover:bg-[#a47148] text-white font-bold rounded-full transition-all shadow-lg shadow-[#bc8a5f]/20"
+              >
+                List a Book
+              </Link>
+            </div>
+            ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {activeBorrows.map((borrow) => (
-                <Link
-                key={borrow.id}
-                href={`/book_listing/${borrow.book.id}`}
-                >
-                <div className="bg-white/40 border border-white/60 rounded-[1.5rem] p-5 shadow-lg shadow-stone-200/30 backdrop-blur-md hover:bg-white/60 transition-all flex flex-col sm:flex-row gap-5">
-                {/* Standardized Book Image */}
-                <div className="w-24 h-40 rounded-xl overflow-hidden border border-white/50 shadow-inner bg-[#e2d9c8]/50 shrink-0 flex items-center justify-center">
-                  {borrow.book.photos[0] ? (
-                    <img src={borrow.book.photos[0]} alt={borrow.book.title} className="h-full w-full object-cover object-center" />
-                  ) : (
-                    <span className="text-4xl opacity-50">📖</span>
-                  )}
-                </div>
-                {/* Standardized Book Info */}
-                <div className="flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3 className="text-lg font-bold text-[#4a4a4a] leading-tight">{borrow.book.title}</h3>
-                    <p className="text-sm text-[#8a8a8a]">by {borrow.book.author}</p>
-                    <div className="mt-2 text-sm text-[#5c5c5c] space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold">Lender:</span>
-                        <Link
-                          href={`/profile/${borrow.book.user.id}`}
-                          className="flex items-center gap-2 hover:text-[#bc8a5f] transition-colors"
-                        >
-                          <img
-                            src={
-                              borrow.book.user.customImage ||
-                              borrow.book.user.image ||
-                              "/default-avatar.png"
-                            }
-                            className="w-6 h-6 rounded-full object-cover border border-white/60"
-                            alt={borrow.book.user.name}
-                          />
+                <div key={borrow.id} className="bg-white/40 border border-white/60 rounded-[1.5rem] p-5 shadow-lg shadow-stone-200/30 backdrop-blur-md hover:bg-white/60 transition-all flex flex-col sm:flex-row gap-5">
+                  {/* Standardized Book Image */}
+                  <div className="w-24 h-40 rounded-xl overflow-hidden border border-white/50 shadow-inner bg-[#e2d9c8]/50 shrink-0 flex items-center justify-center">
+                    {borrow.book.photos[0] ? (
+                      <img src={borrow.book.photos[0]} alt={borrow.book.title} className="h-full w-full object-cover object-center" />
+                    ) : (
+                      <span className="text-4xl opacity-50">📖</span>
+                    )}
+                  </div>
+                  {/* Standardized Book Info */}
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-[#4a4a4a] leading-tight">{borrow.book.title}</h3>
+                      <p className="text-sm text-[#8a8a8a]">by {borrow.book.author}</p>
+                      <div className="mt-2 text-sm text-[#5c5c5c] space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">Lender:</span>
+                          <Link
+                            href={`/profile/${borrow.book.user.id}`}
+                            className="flex items-center gap-2 hover:text-[#bc8a5f] transition-colors"
+                          >
+                            <img
+                              src={
+                                borrow.book.user.customImage ||
+                                borrow.book.user.image ||
+                                "/default-avatar.png"
+                              }
+                              className="w-6 h-6 rounded-full object-cover border border-white/60"
+                              alt={borrow.book.user.name}
+                            />
 
-                          <span className="font-medium">
-                            {borrow.book.user.name}
-                          </span>
-                        </Link>
-                      </div>
+                            <span className="font-medium">
+                              {borrow.book.user.name}
+                            </span>
+                          </Link>
+                        </div>
 
-                      <div className="space-y-1">
-                        <p>
-                          <span className="font-semibold">Borrowed on:</span>{" "}
-                          {new Date(borrow.borrowedAt).toLocaleDateString()}
-                        </p>
+                        <div className="space-y-1">
+                          <p>
+                            <span className="font-semibold">Borrowed on:</span>{" "}
+                            {new Date(borrow.borrowedAt).toLocaleDateString()}
+                          </p>
 
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-semibold">Return by:</span>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold">Return by:</span>
 
-                          <span>
-                            {new Date(borrow.dueAt!).toLocaleDateString()}
-                          </span>
+                            <span>
+                              {new Date(borrow.dueAt!).toLocaleDateString()}
+                            </span>
 
-                          {(() => {
-                            const status = getDueStatus(borrow.dueAt);
+                            {(() => {
+                              const status = getDueStatus(borrow.dueAt);
 
-                            return (
-                              <span className={`text-xs ${status.color}`}>
-                                ({status.text})
-                              </span>
-                            );
-                          })()}
+                              return (
+                                <span className={`text-xs ${status.color}`}>
+                                  ({status.text})
+                                </span>
+                              );
+                            })()}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="mt-4 flex gap-2">
-                      <ReturnBookButton borrowId={borrow.id} bookId={borrow.book.id} />
-                      <ExtendBorrowModal
-                        borrowId={borrow.id}
-                        bookId={borrow.book.id}
-                        lenderId={borrow.book.user.id}
-                        currentDueAt={borrow.dueAt}
-                      />
+                    <div className="mt-4 flex gap-2">
+                        <ReturnBookButton borrowId={borrow.id} bookId={borrow.book.id} />
+                        <ExtendBorrowModal
+                          borrowId={borrow.id}
+                          bookId={borrow.book.id}
+                          lenderId={borrow.book.user.id}
+                          currentDueAt={borrow.dueAt}
+                        />
+                    </div>
                   </div>
                 </div>
-                </div>
-                </Link>
               ))}
             </div>
           )}
